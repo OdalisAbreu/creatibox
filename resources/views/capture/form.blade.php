@@ -16,7 +16,7 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <form method="POST" action="{{ url('/captura/' . $capture->cell_phone) }}" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <form method="POST" action="{{ route('capture.submitImage', ['cell_phone' => $capture->cell_phone]) }}" enctype="multipart/form-data" class="card p-4 shadow-sm">
             @csrf
             <div class="mb-3">
                 <label for="invoice_image" class="form-label">Selecciona una imagen (máx 3MB):</label>

@@ -14,12 +14,8 @@ class AdminController extends Controller
 {
     public function index(Request $request)
     {
-        $captures = Capture::with('user')
-            ->when($request->name, fn($q) => $q->whereHas('user', fn($q) => $q->where('name', 'like', "%{$request->name}%")))
-            ->when($request->cell_phone, fn($q) => $q->where('cell_phone', 'like', "%{$request->cell_phone}%"))
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-
+        // trae todos los captures de la base de datos paginados
+        $captures = Capture::paginate(15);
         return view('admin.index', compact('captures'));
     }
 

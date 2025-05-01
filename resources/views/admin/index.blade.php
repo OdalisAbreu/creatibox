@@ -30,25 +30,8 @@
                         <th>Edad</th>
                         <th>Card ID</th>
                         <th>Celular</th>
+                        <th>Factura</th>
                         <th>Estado</th>
-                    </tr>
-                    <tr>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Filtrar nombre" disabled></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Filtrar email" disabled></th>
-                        <th><select class="form-select form-select-sm" disabled>
-                                <option selected>Todos</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Other</option>
-                            </select></th>
-                        <th><input type="number" class="form-control form-control-sm" placeholder="Edad" disabled></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Card ID" disabled></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Celular" disabled></th>
-                        <th><select class="form-select form-select-sm" disabled>
-                                <option selected>Todos</option>
-                                <option>Completado</option>
-                                <option>Pendiente</option>
-                            </select></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,6 +43,19 @@
                         <td>{{ $capture->age }}</td>
                         <td>{{ $capture->card_id }}</td>
                         <td>{{ $capture->cell_phone }}</td>
+                        <td>
+                            @if ($capture->image_path)
+                            <img src="{{ Storage::url($capture->image_path) }}"
+                                alt="Factura"
+                                class="img-thumbnail"
+                                style="max-width: 70px; cursor: pointer;"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalFactura"
+                                data-image="{{ Storage::url($capture->image_path) }}">
+                            @else
+                            <span class="text-muted">Sin imagen</span>
+                            @endif
+                        </td>
                         <td>
                             @if ($capture->completed)
                             <span class="badge bg-success">Completado</span>
@@ -78,4 +74,50 @@
             {{ $captures->links() }}
         </div>
     </div>
+    <!-- Modal de imagen con botón de descarga -->
+    <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content bg-white rounded shadow p-3 position-relative">
+
+                <!-- Botón cerrar -->
+                <!-- <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Cerrar"></button> -->
+
+                <!-- Imagen -->
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="Factura Grande" class="img-fluid rounded mb-3 mx-auto d-block" style="max-height: 75vh;">
+
+                    <br>
+                    <a id="downloadBtn" href="#" class="btn btn-outline-primary" download target="_blank">
+                        <i class="fas fa-download me-1"></i> Descargar Factura
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JS: cargar imagen + cerrar al hacer clic fuera -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('modalFactura');
+            const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const thumbnails = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#modalFactura"]');
+
+            thumbnails.forEach(img => {
+                img.addEventListener('click', () => {
+                    const imageUrl = img.getAttribute('data-image');
+                    modalImage.src = imageUrl;
+                    downloadBtn.href = imageUrl;
+                });
+            });
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    bsModal.hide();
+                }
+            });
+        });
+    </script>
 </x-app-layout>

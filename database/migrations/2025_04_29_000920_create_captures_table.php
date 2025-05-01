@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('cell_phone')->unique();
             $table->string('name');
             $table->string('email');
-            $table->enum('gender', ['male', 'female', 'other']);
+            $table->string('gender');
             $table->unsignedInteger('age');
             $table->string('card_id');
             $table->string('image_path')->nullable();
