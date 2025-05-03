@@ -15,7 +15,10 @@ class Capture extends Model
         'gender',
         'age',
         'card_id',
-        'image_path',
         'completed',
     ];
+    public function images()
+    {
+        return $this->hasMany(CaptureImage::class);
+    }
 }

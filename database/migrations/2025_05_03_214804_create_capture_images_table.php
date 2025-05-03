@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('captures', function (Blueprint $table) {
+        Schema::create('capture_images', function (Blueprint $table) {
             $table->id();
-            $table->string('cell_phone')->unique();
-            $table->string('name');
-            $table->string('email');
-            $table->string('gender');
-            $table->unsignedInteger('age');
-            $table->string('card_id');
-            $table->boolean('completed')->default(false);
+            $table->foreignId('capture_id')->constrained()->onDelete('cascade');
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('captures');
+        Schema::dropIfExists('capture_images');
     }
 };

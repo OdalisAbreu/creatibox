@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Capture;
+use App\Models\CaptureImage;
 use Illuminate\Http\Request;
 
 class CaptureController extends Controller
@@ -43,8 +44,7 @@ class CaptureController extends Controller
 
     public function showForm($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
-
+        $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail()->load('images');
         // if ($capture->completed) {
         //     return view('capture.completed');
         // }
@@ -64,8 +64,11 @@ class CaptureController extends Controller
         $path = $request->file('invoice_image')->store("invoices", 'public');
 
         // Guarda el path accesible públicamente con Storage::url()
-        $capture->update([
+        CaptureImage::create([
+            'capture_id' => $capture->id,
             'image_path' => $path,
+        ]);
+        $capture->update([
             'completed' => true,
         ]);
 
@@ -75,7 +78,7 @@ class CaptureController extends Controller
 
     public function getClient($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->first();
+        $capture = Capture::where('cell_phone', $cell_phone)->first()->load('images');
 
         if (!$capture) {
             return response()->json(['message' => 'Capture not found'], 404);
