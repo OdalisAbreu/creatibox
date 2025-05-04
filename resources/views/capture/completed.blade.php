@@ -39,14 +39,12 @@
         .confirm-card h1 {
             color: var(--fc-green);
             font-size: 6vw;
-            max-font-size: 2.5rem;
             margin-bottom: 1rem;
         }
 
         .confirm-card p {
             color: #333;
             font-size: 4.5vw;
-            max-font-size: 1.125rem;
             margin-bottom: 1.5rem;
         }
 
@@ -58,7 +56,6 @@
             max-width: 300px;
             padding: .75rem 1rem;
             font-size: 4.5vw;
-            max-font-size: 1rem;
             color: #fff;
             background: var(--whatsapp-green);
             border: none;
@@ -82,8 +79,41 @@
 
         .redirect-note {
             font-size: 3.5vw;
-            max-font-size: .875rem;
             color: #666;
+        }
+
+        /* Tablet and desktop adjustments */
+        @media (min-width: 768px) {
+            .confirm-card {
+                width: 80vw;
+                max-width: 500px;
+                padding: 3rem 2rem;
+            }
+
+            .confirm-card h1 {
+                font-size: 2.5rem;
+            }
+
+            .confirm-card p {
+                font-size: 1.125rem;
+            }
+
+            .whatsapp-btn {
+                width: 250px;
+                font-size: 1rem;
+            }
+
+            .redirect-note {
+                font-size: .875rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .confirm-card {
+                width: 60vw;
+                max-width: 600px;
+                padding: 4rem 3rem;
+            }
         }
     </style>
 </head>
@@ -95,10 +125,7 @@
             <p>Ya hemos recibido tu factura. Muchas gracias.</p>
 
             {{-- Botón volver a WhatsApp --}}
-            <a href="https://wa.me/18098510363"
-                class="whatsapp-btn"
-                target="_blank"
-                rel="noopener">
+            <a href="https://wa.me/18098510363" class="whatsapp-btn" target="_blank" rel="noopener">
                 <i class="bi bi-whatsapp"></i>
                 Volver a WhatsApp
             </a>
@@ -120,7 +147,7 @@
             if (seconds <= 0) clearInterval(interval);
         }, 1000);
 
-        // Redirección automática tras 5s
+        //  Redirección automática tras 5 s
         setTimeout(() => {
             window.location.href = 'https://wa.me/18098510363';
         }, 5000);

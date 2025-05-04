@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Capture;
 use App\Models\CaptureImage;
+use App\Services\WasapiService;
 use Illuminate\Http\Request;
 
 class CaptureController extends Controller
 {
+
     public function store(Request $request, $cell_phone)
     {
         // $request->validate([
@@ -71,6 +73,9 @@ class CaptureController extends Controller
         $capture->update([
             'completed' => true,
         ]);
+
+        $wasapiService = new WasapiService();
+        $wasapiService->sendText($capture->cell_phone, "¡Tu resgitro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
 
         return view('capture.completed', compact('capture'));
     }

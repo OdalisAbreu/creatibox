@@ -83,6 +83,17 @@
         .loading-overlay.show {
             display: flex;
         }
+
+        @media (min-width: 768px) {
+            .camera-label {
+                width: 200px;
+                /* Tamaño fijo para PC */
+                height: 200px;
+                /* Tamaño fijo para PC */
+                font-size: 5rem;
+                /* Tamaño del ícono reducido */
+            }
+        }
     </style>
 </head>
 

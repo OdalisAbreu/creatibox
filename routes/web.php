@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/export/pdf', [AdminController::class, 'exportPdf']);
 
     Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteCapture'])->name('admin.deleteCapture');
+    Route::post('/admin/upload-image', [AdminController::class, 'uploadImage'])->name('admin.uploadImage');
 });
 
 require __DIR__ . '/auth.php';

@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'wasapi' => [
+        'url'     => env('WASAPI_URL', 'https://api-ws.wasapi.io/api/v1'),
+        'token'   => env('WASAPI_TOKEN'),
+        'from_id' => env('WASAPI_FROM_ID'),
+    ],
+
 ];

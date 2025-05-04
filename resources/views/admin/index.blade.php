@@ -13,6 +13,33 @@
             </div>
             @endif
         </div>
+        <!-- Tarjetas de resumen -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-warning shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Pendientes</h5>
+                        <p class="card-text fs-4">{{ $pendingCount }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Completados</h5>
+                        <p class="card-text fs-4">{{ $completedCount }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-primary shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Registros</h5>
+                        <p class="card-text fs-4">{{ $totalCount }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Filtros generales -->
         <form method="GET" class="d-flex align-items-center mb-4">
@@ -31,8 +58,11 @@
             <div class="me-2">
                 <button type="submit" class="btn btn-primary me-2">🔍 Filtrar</button>
             </div>
-            <div>
+            <div class="me-2">
                 <a href="{{ url('/admin') }}" class="btn btn-secondary">🧹 Limpiar</a>
+            </div>
+            <div>
+                <button type="button" class="btn btn-info" onclick="location.reload();">🔄 Actualizar</button>
             </div>
         </form>
 
@@ -49,7 +79,7 @@
                         <th>Celular</th>
                         <th>Factura</th>
                         <th>Estado</th>
-                        <th>Factura</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,21 +112,36 @@
                             @endif
                         </td>
                         <td>
-                            <!-- Botón de eliminar -->
-                            @if ($capture->image_id)
-                            <button type="button"
-                                class="btn btn-danger btn-lg d-flex justify-content-center align-items-center delete-btn"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                                data-name="{{ $capture->name }}"
-                                data-url="{{ route('admin.deleteCapture', $capture->image_id) }}"
-                                style="width: 50px; height: 50px;"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                title="Solo eliminará la factura">
-                                <i class="fas fa-trash-alt" style="font-size: 1.5rem;"></i>
-                            </button>
-                            @endif
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <!-- Botón de eliminar -->
+                                @if ($capture->image_id)
+                                <button type="button"
+                                    class="btn btn-danger d-flex justify-content-center align-items-center delete-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-name="{{ $capture->name }}"
+                                    data-url="{{ route('admin.deleteCapture', $capture->image_id) }}"
+                                    style="width: 50px; height: 50px;"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Solo eliminará la factura">
+                                    <i class="fas fa-trash-alt" style="font-size: 1.5rem;"></i>
+                                </button>
+                                @endif
+
+                                <!-- Botón de subir imagen -->
+                                <button type="button"
+                                    class="btn btn-primary d-flex justify-content-center align-items-center upload-image-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#uploadImageModal"
+                                    data-id="{{ $capture->id }}"
+                                    style="width: 50px; height: 50px;"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Subir imagen">
+                                    <i class="fas fa-camera" style="font-size: 1.5rem;"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -158,6 +203,35 @@
 
     <!--------------------------------------------------------------------------------------->
 
+
+    <!-- Modal para subir imagen -->
+    <div class="modal fade" id="uploadImageModal" tabindex="-1" aria-labelledby="uploadImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="uploadImageForm" method="POST" action="{{ route('admin.uploadImage') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadImageModalLabel">Subir Imagen</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="capture_id" id="captureId">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Seleccionar Imagen</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Subir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--------------------------------------------------------------------------------------->
+
     <!-- JS: cargar imagen + cerrar al hacer clic fuera -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -165,6 +239,8 @@
             const modalImage = document.getElementById('modalImage');
             const downloadBtn = document.getElementById('downloadBtn');
             const thumbnails = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#modalFactura"]');
+            const uploadButtons = document.querySelectorAll('.upload-image-btn');
+            const captureIdInput = document.getElementById('captureId');
 
             const deleteModal = document.getElementById('deleteModal');
             const deleteName = document.getElementById('deleteName');
@@ -195,10 +271,17 @@
                     deleteName.textContent = name;
                     deleteForm.setAttribute('action', url);
                 });
-
                 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 tooltipTriggerList.forEach(function(tooltipTriggerEl) {
                     new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            });
+
+
+            uploadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const captureId = this.getAttribute('data-id');
+                    captureIdInput.value = captureId;
                 });
             });
         });

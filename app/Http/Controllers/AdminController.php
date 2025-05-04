@@ -47,9 +47,14 @@ class AdminController extends Controller
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
-        $captures = $query->latest('captures.created_at')->paginate(15);
+        // Totales
+        $pendingCount = Capture::where('completed', 0)->count();
+        $completedCount = CaptureImage::count(); // Contar imágenes como completados
+        $totalCount = $pendingCount + $completedCount;
 
-        return view('admin.index', compact('captures'));
+        $captures = $query->paginate(15);
+
+        return view('admin.index', compact('captures', 'pendingCount', 'completedCount', 'totalCount'));
     }
 
     public function exportExcel(Request $request)
@@ -111,6 +116,12 @@ class AdminController extends Controller
     {
         $captureImage = CaptureImage::find($id);
         $captureImage->delete();
+        //valida si el usuario no tiene imagenes y si no las tiene cambia el estado a 0
+        $capture = Capture::find($captureImage->capture_id);
+        if ($capture->images()->count() == 0) {
+            $capture->update(['completed' => false]);
+        }
+        // Eliminar la imagen del almacenamiento
 
         return redirect()->route('dashboard')->with('success', 'Capture deleted successfully.');
     }
@@ -138,5 +149,28 @@ class AdminController extends Controller
 
         // Retorna el HTML plano (sin mPDF)
         return view('admin.export-pdf', compact('captures'));
+    }
+
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'capture_id' => 'required|exists:captures,id',
+            'image' => 'required|image|max:3126', // Máximo 3MB
+        ]);
+
+        $capture = Capture::findOrFail($request->capture_id);
+
+        // Guardar la imagen en el almacenamiento
+        $path = $request->file('image')->store('invoices', 'public');
+
+        // Crear o actualizar el registro de la imagen
+        CaptureImage::updateOrCreate(
+            ['capture_id' => $capture->id],
+            ['image_path' => $path]
+        );
+        // Actualizar el estado de la captura a completado
+        $capture->update(['completed' => true]);
+
+        return redirect()->route('dashboard')->with('success', 'Imagen subida correctamente.');
     }
 }
