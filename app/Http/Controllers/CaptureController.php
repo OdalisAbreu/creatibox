@@ -78,12 +78,12 @@ class CaptureController extends Controller
 
     public function getClient($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->first()->load('images');
+        $capture = Capture::where('cell_phone', $cell_phone)->first();
 
         if (!$capture) {
             return response()->json(['message' => 'Capture not found'], 404);
         }
 
-        return response()->json($capture);
+        return response()->json($capture->load('images'));
     }
 }
