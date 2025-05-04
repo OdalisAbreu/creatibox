@@ -153,10 +153,6 @@ class AdminController extends Controller
 
     public function uploadImage(Request $request)
     {
-        $request->validate([
-            'capture_id' => 'required|exists:captures,id',
-            'image' => 'required|image|max:3126', // Máximo 3MB
-        ]);
 
         $capture = Capture::findOrFail($request->capture_id);
 

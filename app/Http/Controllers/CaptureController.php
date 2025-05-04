@@ -58,10 +58,6 @@ class CaptureController extends Controller
     {
         $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
 
-        $request->validate([
-            'invoice_image' => 'required|image|max:3072',
-        ]);
-
         // Guarda en storage/app/public/invoices y retorna el path relativo
         $path = $request->file('invoice_image')->store("invoices", 'public');
 
