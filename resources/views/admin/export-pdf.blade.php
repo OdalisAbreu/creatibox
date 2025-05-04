@@ -68,11 +68,7 @@
 
 <body>
 
-    <header>
-        Sistema FacturaCapture • {{ now()->format('d/m/Y H:i') }}
-    </header>
-
-    <h2 class="title">Reporte de Capturas</h2>
+    <h2 class="title">Reporte de Capturas {{ now()->format('d/m/Y H:i') }}</h2>
 
     <table>
         <thead>
@@ -101,11 +97,13 @@
                 <td>{{ $capture->age }}</td>
                 <td>{{ $capture->card_id }}</td>
                 <td>
-                    @if($capture->full_image_path)
-                    <img src="{{ $capture->full_image_path }}" alt="captura">
+                    @if(Storage::disk('public')->exists($capture->image_path))
+                    <img src="{{ 'file://'.public_path('storage/'.$capture->image_path) }}" width="120">
+                    @else
+                    <span>Imagen no disponible</span>
                     @endif
                 </td>
-                <td>{{ $capture->completed_status }}</td>
+                <td>{{ $capture->estado }}</td>
                 <td>{{ \Carbon\Carbon::parse($capture->created_at)->format('d/m/Y H:i') }}</td>
                 <td>
                     @if($capture->invoice_created_at)

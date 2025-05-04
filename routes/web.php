@@ -24,5 +24,8 @@ require __DIR__ . '/auth.php';
 Route::get('/capture/{cell_phone}', [CaptureController::class, 'showForm'])
     ->name('capture.form');
 
+Route::get('/admin/export/preview', [AdminController::class, 'previewPdf'])
+    ->name('admin.export.preview');
+
 Route::post('/capture/image/{cell_phone}', [CaptureController::class, 'submitImage'])
     ->name('capture.submitImage');

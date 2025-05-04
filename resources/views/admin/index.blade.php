@@ -1,21 +1,38 @@
 <x-app-layout>
     <div class="container mt-5">
-        <h1 class="h2 mb-4">📄 Panel de Capturas</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">📄 Panel de Capturas</h1>
+            @if ($captures->count() > 0)
+            <div>
+                <a href="{{ url('/admin/export/excel') }}?{{ http_build_query(request()->all()) }}" class="btn btn-success me-2">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </a>
+                <a href="{{ url('/admin/export/pdf') }}?{{ http_build_query(request()->all()) }}" class="btn btn-danger" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </a>
+            </div>
+            @endif
+        </div>
 
         <!-- Filtros generales -->
-        <form method="GET" class="row g-3 mb-4">
-            <div class="col-md-3">
+        <form method="GET" class="d-flex align-items-center mb-4">
+            <div class="me-3">
                 <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Buscar por nombre">
             </div>
-            <div class="col-md-3">
+            <div class="me-3">
                 <input type="text" name="cell_phone" value="{{ request('cell_phone') }}" class="form-control" placeholder="Buscar por celular">
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+            <div class="me-3">
+                <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" placeholder="Fecha inicio">
             </div>
-            <div class="col-md-4 text-end">
-                <a href="{{ url('/admin/export/excel') }}" class="btn btn-success me-2">⬇️ Exportar Excel</a>
-                <a href="{{ url('/admin/export/pdf') }}" class="btn btn-danger">⬇️ Exportar PDF</a>
+            <div class="me-3">
+                <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" placeholder="Fecha fin">
+            </div>
+            <div class="me-2">
+                <button type="submit" class="btn btn-primary me-2">🔍 Filtrar</button>
+            </div>
+            <div>
+                <a href="{{ url('/admin') }}" class="btn btn-secondary">🧹 Limpiar</a>
             </div>
         </form>
 
