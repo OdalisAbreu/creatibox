@@ -1,33 +1,151 @@
+{{-- resources/views/capture/upload.blade.php --}}
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <title>Subir Factura - FacturaCapture</title>
+    <title>Subir Factura – FacturaCapture</title>
+
+    {{-- 1. Meta viewport para móviles --}}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{-- Bootstrap & Icons --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --fc-green: #008037;
+            --fc-blue: #0065B3;
+            --bs-primary: var(--fc-green);
+        }
+
+        body {
+            font-family: "Poppins", Helvetica, Arial, sans-serif;
+            background: #f7f9fa;
+            padding: 1rem 0;
+        }
+
+        /* 2. Card ocupa casi todo el ancho en móviles */
+        .capture-card {
+            width: 90vw;
+            max-width: 420px;
+            margin: 0 auto;
+            border-radius: 1rem;
+            border: 0;
+        }
+
+        /* 3. Botón cámara escala con viewport width */
+        .camera-label {
+            width: 50vw;
+            height: 50vw;
+            max-width: 280px;
+            max-height: 280px;
+            border-radius: 35%;
+            background: var(--fc-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 15vw;
+            /* Aumenta el tamaño del ícono */
+            max-font-size: 12rem;
+            /* Ajusta el tamaño máximo del ícono */
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            transition: transform .15s ease-in;
+        }
+
+        .camera-label:hover,
+        .camera-label:focus {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        /* Ocultamos el input real */
+        #invoice_image {
+            position: absolute;
+            left: -9999px;
+        }
+
+        /* Overlay de carga */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, .8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1055;
+            font-size: 1.25rem;
+            color: var(--fc-blue);
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+    </style>
 </head>
 
-<body class="bg-light py-5">
-    <div class="container">
-        <h1 class="mb-4">Hola, {{ $capture->name }} 👋</h1>
-        <p>Por favor, sube una foto de tu factura:</p>
+<body>
+    <div class="container-fluid px-3">
+        <h2 class="fw-bold mb-3 text-center text-uppercase" style="color:var(--fc-blue)">
+            Hola, {{ $capture->name }} 👋
+        </h2>
+        <p class="text-center mb-4">Toma una foto o selecciona la imagen de tu factura</p>
 
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <form method="POST" action="{{ route('capture.submitImage', ['cell_phone' => $capture->cell_phone]) }}" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <form id="captureForm"
+            method="POST"
+            action="{{ route('capture.submitImage', ['cell_phone' => $capture->cell_phone]) }}"
+            enctype="multipart/form-data"
+            class="card p-4 shadow-sm capture-card">
+
             @csrf
-            <div class="mb-3">
-                <label for="invoice_image" class="form-label">Selecciona una imagen (máx 3MB):</label>
-                <input class="form-control" type="file" id="invoice_image" name="invoice_image" accept="image/*" required>
-                @error('invoice_image')
-                <small class="text-danger">{{ $message }}</small>
-                @enderror
+
+            <div class="d-flex justify-content-center mb-3">
+                <label for="invoice_image" class="camera-label" title="Tomar foto / elegir imagen">
+                    <i class="bi bi-camera-fill"></i>
+                </label>
+                <input type="file"
+                    id="invoice_image"
+                    name="invoice_image"
+                    accept="image/*"
+                    capture="environment"
+                    required>
             </div>
-            <button class="btn btn-primary" type="submit">Subir Factura</button>
+
+            <p class="text-center small text-muted mb-0">
+                Formatos admitidos: JPG, PNG, HEIC … (máx. 3 MB)
+            </p>
         </form>
     </div>
+
+    <div id="loading" class="loading-overlay">
+        <div class="spinner-border me-2" role="status" aria-hidden="true"></div>
+        Subiendo tu factura…
+    </div>
+
+    <script>
+        (function() {
+            const fileInput = document.getElementById('invoice_image');
+            const form = document.getElementById('captureForm');
+            const loading = document.getElementById('loading');
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    loading.classList.add('show');
+                    form.submit();
+                }
+            });
+
+            form.addEventListener('submit', () => {
+                fileInput.disabled = true;
+            });
+        })();
+    </script>
 </body>
 
 </html>

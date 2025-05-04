@@ -21,6 +21,7 @@ class AdminController extends Controller
             ->select(
                 'captures.*',
                 'capture_images.image_path',
+                'capture_images.id AS image_id',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado")
             );
 
