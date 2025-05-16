@@ -97,10 +97,15 @@
                 <td>{{ $capture->age }}</td>
                 <td>{{ $capture->card_id }}</td>
                 <td>
-                    @if(Storage::disk('public')->exists($capture->image_path))
-                    <img src="{{ 'file://'.public_path('storage/'.$capture->image_path) }}" width="120">
+                    @php
+                        $path = $capture->image_path;
+                    @endphp
+
+                    @if (!empty($path) && Storage::disk('public')->exists($path))
+                        <img src="{{ 'file://' . public_path('storage/' . $path) }}"
+                            width="80" height="80" />
                     @else
-                    <span>Imagen no disponible</span>
+                        <span>Imagen no disponible</span>
                     @endif
                 </td>
                 <td>{{ $capture->estado }}</td>
