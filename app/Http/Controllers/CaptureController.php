@@ -71,7 +71,7 @@ class CaptureController extends Controller
         ]);
 
         $wasapiService = new WasapiService();
-        $wasapiService->sendText($capture->cell_phone, "¡Tu resgitro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
+        $wasapiService->sendText($capture->cell_phone, "¡Tu registro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
 
         return view('capture.completed', compact('capture'));
     }
