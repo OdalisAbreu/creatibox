@@ -151,7 +151,7 @@
 
         <!-- Paginación -->
         <div class="mt-4">
-            {{ $captures->links() }}
+            {{ $captures->appends(request()->query())->links() }}
         </div>
     </div>
 
