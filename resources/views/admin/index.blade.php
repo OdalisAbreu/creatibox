@@ -72,7 +72,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Nombre</th>
-                        <th>Email</th>
+                        <th style="max-width: 45px;">Email</th>
                         <th>Género</th>
                         <th>Edad</th>
                         <th>Card ID</th>
@@ -85,7 +85,7 @@
                 <tbody>
                     @foreach ($captures as $capture)
                     <tr>
-                        <td>{{ $capture->name }}</td>
+                    <td><a href="/capture/{{ $capture->cell_phone }}">  {{ $capture->name }} </a></td>
                         <td>{{ $capture->email }}</td>
                         <td>{{ ucfirst($capture->gender) }}</td>
                         <td>{{ $capture->age }}</td>
@@ -141,6 +141,7 @@
                                     title="Subir imagen">
                                     <i class="fas fa-camera" style="font-size: 1.5rem;"></i>
                                 </button>
+
                             </div>
                         </td>
                     </tr>
