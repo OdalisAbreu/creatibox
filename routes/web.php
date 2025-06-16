@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteCapture'])->name('admin.deleteCapture');
     Route::post('/admin/upload-image', [AdminController::class, 'uploadImage'])->name('admin.uploadImage');
+    Route::post('/admin/store-capture', [AdminController::class, 'storeCapture'])->name('admin.storeCapture');
 });
 
 require __DIR__ . '/auth.php';

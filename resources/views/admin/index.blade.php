@@ -2,16 +2,19 @@
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h2">📄 Panel de Capturas</h1>
-            @if ($captures->count() > 0)
             <div>
+                <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newParticipantModal">
+                    <i class="fas fa-plus"></i> Nuevo Participante
+                </button>
+                @if ($captures->count() > 0)
                 <a href="{{ url('/admin/export/excel') }}?{{ http_build_query(request()->all()) }}" class="btn btn-success me-2">
                     <i class="fas fa-file-excel"></i> Exportar Excel
                 </a>
                 <a href="{{ url('/admin/export/pdf') }}?{{ http_build_query(request()->all()) }}" class="btn btn-danger" target="_blank">
                     <i class="fas fa-file-pdf"></i> Exportar PDF
                 </a>
+                @endif
             </div>
-            @endif
         </div>
         <!-- Tarjetas de resumen -->
         <div class="row mb-4">
@@ -225,6 +228,92 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Subir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--------------------------------------------------------------------------------------->
+
+    <!-- Modal para nuevo participante -->
+    <div class="modal fade" id="newParticipantModal" tabindex="-1" aria-labelledby="newParticipantModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="newParticipantForm" method="POST" action="{{ route('admin.storeCapture') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newParticipantModalLabel">Nuevo Participante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Género</label>
+                            <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender" required>
+                                <option value="">Seleccione...</option>
+                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Masculino</option>
+                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Femenino</option>
+                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Otro</option>
+                            </select>
+                            @error('gender')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Edad</label>
+                            <input type="number" class="form-control @error('age') is-invalid @enderror" id="age" name="age" value="{{ old('age') }}" required min="0">
+                            @error('age')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="card_id" class="form-label">Card ID</label>
+                            <input type="text" class="form-control @error('card_id') is-invalid @enderror" id="card_id" name="card_id" value="{{ old('card_id') }}" required>
+                            @error('card_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="cell_phone" class="form-label">Celular</label>
+                            <input type="text" class="form-control @error('cell_phone') is-invalid @enderror" id="cell_phone" name="cell_phone" value="{{ old('cell_phone') }}" required>
+                            @error('cell_phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="invoice_image" class="form-label">Factura</label>
+                            <input type="file" class="form-control @error('invoice_image') is-invalid @enderror" id="invoice_image" name="invoice_image" accept="image/*" required>
+                            @error('invoice_image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
             </div>

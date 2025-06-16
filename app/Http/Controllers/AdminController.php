@@ -153,7 +153,6 @@ class AdminController extends Controller
 
     public function uploadImage(Request $request)
     {
-
         $capture = Capture::findOrFail($request->capture_id);
 
         // Guardar la imagen en el almacenamiento
@@ -168,5 +167,53 @@ class AdminController extends Controller
         $capture->update(['completed' => true]);
 
         return redirect()->route('dashboard')->with('success', 'Imagen subida correctamente.');
+    }
+
+    public function storeCapture(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'gender' => 'required|in:male,female,other',
+                'age' => 'required|integer|min:0',
+                'card_id' => 'required|string|max:255',
+                'cell_phone' => 'required|string|max:255|unique:captures,cell_phone',
+                'invoice_image' => 'required|image|max:2048'
+            ]);
+
+            // Limpiar el card_id para que solo contenga números
+            $card_id = preg_replace('/\s+/', '', $request->card_id);
+            $card_id = preg_replace('/\D/', '', $card_id);
+
+            // Crear el registro de captura
+            $capture = Capture::create([
+                'cell_phone' => $request->cell_phone,
+                'name' => $request->name,
+                'email' => $request->email,
+                'gender' => $request->gender,
+                'age' => $request->age,
+                'card_id' => $card_id,
+                'completed' => true
+            ]);
+
+            // Guardar la imagen en el almacenamiento
+            $path = $request->file('invoice_image')->store('invoices', 'public');
+
+            // Crear el registro de la imagen
+            CaptureImage::create([
+                'capture_id' => $capture->id,
+                'image_path' => $path
+            ]);
+
+            return redirect()->route('dashboard')->with('success', 'Participante creado correctamente.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['cell_phone' => 'Este número de celular ya está registrado.']);
+            }
+            throw $e;
+        }
     }
 }
