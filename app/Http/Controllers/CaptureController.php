@@ -14,15 +14,6 @@ class CaptureController extends Controller
 
     public function store(Request $request, $cell_phone)
     {
-        // $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'last_name' => 'nullable|string|max:255',
-        //     'invoice_number' => 'required|string|max:255',
-        //     'contact_number' => 'nullable|string|max:255',
-        //     'city' => 'nullable|string|max:255',
-        //     'storage' => 'nullable|string|max:255',
-        //     'card_id' => 'required|string|max:255'
-        // ]);
 
         $capture = Capture::where('cell_phone', $cell_phone)->first();
 
@@ -66,7 +57,7 @@ class CaptureController extends Controller
         try {
             // Validar que se envíe una imagen
             $request->validate([
-                'invoice_image' => 'required|image|max:3072' // 3MB máximo
+                'invoice_image' => 'required|image|max:5072' // 3MB máximo
             ]);
 
             $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();

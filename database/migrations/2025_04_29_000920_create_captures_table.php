@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('captures', function (Blueprint $table) {
             $table->id();
-            $table->string('cell_phone')->unique();
+            $table->string('cell_phone');
             $table->string('name');
             $table->string('last_name');
             $table->string('city');
