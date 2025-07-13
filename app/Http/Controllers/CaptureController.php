@@ -17,9 +17,15 @@ class CaptureController extends Controller
 
         $capture = Capture::where('cell_phone', $cell_phone)->first();
     
+        if ($capture) {
+            $cell_phone = $request->contact_number ?? $cell_phone;
+        }
+
         // limpiar el texto del $request->card_id para que solo contenga números y no contenga espacios
         $card_id = preg_replace('/\s+/', '', $request->card_id);
         $card_id = preg_replace('/\D/', '', $card_id);
+
+
     
         Capture::create([
             'cell_phone' => $cell_phone,
