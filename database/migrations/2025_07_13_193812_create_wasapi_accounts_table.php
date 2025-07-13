@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('token');
             $table->string('wasapi_id');
+            $table->text('final_message')->nullable();
             $table->timestamps();
         });
     }

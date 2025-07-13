@@ -91,9 +91,9 @@ class CaptureController extends Controller
             $capture->update([
                 'completed' => true,
             ]);
-
+            $wasapiAccount = WasapiAccount::first();
             $wasapiService = new WasapiService();
-            $wasapiService->sendText($capture->cell_phone, "¡Tu registro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
+            $wasapiService->sendText($wasapiAccount->phone, $wasapiAccount->final_message);
             $wasapiAccount = WasapiAccount::first();
             return view('capture.completed', compact('capture', 'wasapiAccount'));
             
