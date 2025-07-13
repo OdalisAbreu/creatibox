@@ -64,6 +64,7 @@ class CaptureController extends Controller
 
     public function submitImage(Request $request, $cell_phone)
     {
+        Log::info('submitImage', ['request' => $request->all()]);
         try {
             // Validar que se envíe una imagen
             $request->validate([
