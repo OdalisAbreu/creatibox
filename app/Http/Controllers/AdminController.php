@@ -74,7 +74,17 @@ class AdminController extends Controller
     {
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
-                'captures.*',
+                'captures.id',
+                'captures.invoice_number',
+                'captures.name',
+                'captures.last_name',
+                'captures.card_id',
+                'captures.cell_phone',
+                'captures.contact_number',
+                'captures.city',
+                'captures.storage',
+                'captures.completed',
+                'captures.created_at',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado")
             );
@@ -134,9 +144,10 @@ class AdminController extends Controller
                 'captures.id',
                 'captures.name',
                 'captures.cell_phone',
-                'captures.email',
-                'captures.gender',
-                'captures.age',
+                'captures.last_name',
+                'captures.contact_number',
+                'captures.city',
+                'captures.storage',
                 'captures.card_id',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
@@ -172,7 +183,7 @@ class AdminController extends Controller
     public function storeCapture(Request $request)
     {
         try {
-            $request->validate([
+         /*   $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email',
                 'gender' => 'required|in:male,female,other',
@@ -180,7 +191,7 @@ class AdminController extends Controller
                 'card_id' => 'required|string|max:255',
                 'cell_phone' => 'required|string|max:255|unique:captures,cell_phone',
                 'invoice_image' => 'required|image|max:2048'
-            ]);
+            ]);*/
 
             // Limpiar el card_id para que solo contenga números
             $card_id = preg_replace('/\s+/', '', $request->card_id);
@@ -190,9 +201,11 @@ class AdminController extends Controller
             $capture = Capture::create([
                 'cell_phone' => $request->cell_phone,
                 'name' => $request->name,
-                'email' => $request->email,
-                'gender' => $request->gender,
-                'age' => $request->age,
+                'last_name' => $request->last_name ?? '',
+                'invoice_number' => $request->invoice_number,
+                'contact_number' => $request->contact_number ?? $request->cell_phone,
+                'city' => $request->city ?? '',
+                'storage' => $request->storage ?? '',
                 'card_id' => $card_id,
                 'completed' => true
             ]);

@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('cell_phone')->unique();
             $table->string('name');
-            $table->string('email');
-            $table->string('gender');
-            $table->unsignedInteger('age');
+            $table->string('last_name');
+            $table->string('city');
+            $table->string('storage');
+            $table->string('invoice_number')->nullable();
+            $table->string('contact_number')->nullable();
             $table->string('card_id');
             $table->boolean('completed')->default(false);
             $table->timestamps();

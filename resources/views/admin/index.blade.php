@@ -74,26 +74,31 @@
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-light">
                     <tr>
+                        <th>No. Factura</th>
                         <th>Nombre</th>
-                        <th style="max-width: 45px;">Email</th>
-                        <th>Género</th>
-                        <th>Edad</th>
+                        <th>Apellido</th>
                         <th>Card ID</th>
-                        <th>Celular</th>
-                        <th>Factura</th>
+                        <th>Num. Contacto</th>
                         <th>Estado</th>
+                        <th>Factura</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($captures as $capture)
                     <tr>
-                    <td><a href="/capture/{{ $capture->cell_phone }}">  {{ $capture->name }} </a></td>
-                        <td>{{ $capture->email }}</td>
-                        <td>{{ ucfirst($capture->gender) }}</td>
-                        <td>{{ $capture->age }}</td>
+                        <td><a href="/capture/{{ $capture->cell_phone }}">{{ $capture->invoice_number }}</a></td>
+                        <td>  {{ $capture->name }} </td>
+                        <td>{{ $capture->last_name }}</td>
                         <td>{{ $capture->card_id }}</td>
-                        <td>{{ $capture->cell_phone }}</td>
+                        <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
+                        <td>
+                            @if ($capture->completed)
+                            <span class="badge bg-success">Completado</span>
+                            @else
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                            @endif
+                        </td>
                         <td>
                             @if ($capture->image_path)
                             <img src="{{ Storage::url($capture->image_path) }}"
@@ -105,13 +110,6 @@
                                 data-image="{{ Storage::url($capture->image_path) }}">
                             @else
                             <span class="text-muted">Sin imagen</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if ($capture->completed)
-                            <span class="badge bg-success">Completado</span>
-                            @else
-                            <span class="badge bg-warning text-dark">Pendiente</span>
                             @endif
                         </td>
                         <td>
@@ -257,6 +255,13 @@
                         </div>
                         @endif
                         <div class="mb-3">
+                            <label for="invoice_number" class="form-label">Número de Factura</label>
+                            <input type="text" class="form-control @error('invoice_number') is-invalid @enderror" id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}" required>
+                            @error('invoice_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <label for="name" class="form-label">Nombre</label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                             @error('name')
@@ -264,33 +269,15 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
-                            @error('email')
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control @error('last_name') is-invalid @enderror" id="last_name" name="last_name" value="{{ old('last_name') }}" required>
+                            @error('last_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
                         <div class="mb-3">
-                            <label for="gender" class="form-label">Género</label>
-                            <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender" required>
-                                <option value="">Seleccione...</option>
-                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Masculino</option>
-                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Femenino</option>
-                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Otro</option>
-                            </select>
-                            @error('gender')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="age" class="form-label">Edad</label>
-                            <input type="number" class="form-control @error('age') is-invalid @enderror" id="age" name="age" value="{{ old('age') }}" required min="0">
-                            @error('age')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="card_id" class="form-label">Card ID</label>
+                            <label for="card_id" class="form-label">Cédula</label>
                             <input type="text" class="form-control @error('card_id') is-invalid @enderror" id="card_id" name="card_id" value="{{ old('card_id') }}" required>
                             @error('card_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -300,6 +287,27 @@
                             <label for="cell_phone" class="form-label">Celular</label>
                             <input type="text" class="form-control @error('cell_phone') is-invalid @enderror" id="cell_phone" name="cell_phone" value="{{ old('cell_phone') }}" required>
                             @error('cell_phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="contact_number" class="form-label">Número de Contacto</label>
+                            <input type="text" class="form-control @error('contact_number') is-invalid @enderror" id="contact_number" name="contact_number" value="{{ old('contact_number') }}">
+                            @error('contact_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">Ciudad</label>
+                            <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city') }}" required>
+                            @error('city')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="storage" class="form-label">Almacén</label>
+                            <input type="text" class="form-control @error('storage') is-invalid @enderror" id="storage" name="storage" value="{{ old('storage') }}" required>
+                            @error('storage')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

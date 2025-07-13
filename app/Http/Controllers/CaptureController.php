@@ -14,9 +14,11 @@ class CaptureController extends Controller
     {
         // $request->validate([
         //     'name' => 'required|string|max:255',
-        //     'email' => 'required|email',
-        //     'gender' => 'required|in:male,female,other',
-        //     'age' => 'required|integer|min:0',
+        //     'last_name' => 'nullable|string|max:255',
+        //     'invoice_number' => 'required|string|max:255',
+        //     'contact_number' => 'nullable|string|max:255',
+        //     'city' => 'nullable|string|max:255',
+        //     'storage' => 'nullable|string|max:255',
         //     'card_id' => 'required|string|max:255'
         // ]);
 
@@ -37,10 +39,13 @@ class CaptureController extends Controller
         Capture::create([
             'cell_phone' => $cell_phone,
             'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'age' => $request->age,
-            'card_id' => $card_id
+            'last_name' => $request->last_name ?? '',
+            'invoice_number' => $request->invoice_number,
+            'contact_number' => $request->contact_number ?? $cell_phone,
+            'city' => $request->city ?? '',
+            'storage' => $request->storage ?? '',
+            'card_id' => $card_id,
+            'completed' => false
         ]);
     }
 
