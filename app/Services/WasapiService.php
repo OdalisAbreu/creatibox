@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\WasapiAccount;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -13,9 +14,10 @@ class WasapiService
 
     public function __construct()
     {
+        $wasapiAccount = WasapiAccount::first();
         $this->baseUrl = config('services.wasapi.url');
-        $this->token   = config('services.wasapi.token');
-        $this->fromId  = config('services.wasapi.from_id');
+        $this->token   = $wasapiAccount->token;
+        $this->fromId  = $wasapiAccount->wasapi_id;
     }
 
     /**

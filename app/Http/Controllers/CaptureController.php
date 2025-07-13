@@ -56,11 +56,8 @@ class CaptureController extends Controller
         $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail()->load('images');
         
         // Si ya tiene una imagen, redirigir a la página de completado
-        if ($capture->images()->exists()) {
-            return view('capture.completed', compact('capture'));
-        }
-
-        return view('capture.form', compact('capture'));
+        $wasapiAccount = WasapiAccount::first();
+        return view('capture.form', compact('capture', 'wasapiAccount'));
     }
 
     public function submitImage(Request $request, $cell_phone)
@@ -74,10 +71,6 @@ class CaptureController extends Controller
 
             $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
 
-            // Verificar si ya tiene una imagen
-            if ($capture->images()->exists()) {
-                return redirect()->back()->with('error', 'Ya tienes una factura registrada.');
-            }
 
             // Guarda en storage/app/public/invoices y retorna el path relativo
             $path = $request->file('invoice_image')->store("invoices", 'public');
@@ -92,14 +85,11 @@ class CaptureController extends Controller
                 'completed' => true,
             ]);
             
-          //  $wasapiAccount = WasapiAccount::first();
-            //$wasapiService = new WasapiService();
-           // $wasapiService->sendText($wasapiAccount->phone, $wasapiAccount->final_message);
           
-
+           $wasapiAccount = WasapiAccount::first();
+//return $wasapiAccount->final_message;
             $wasapiService = new WasapiService();
-            $wasapiService->sendText($capture->cell_phone, "Ya estás a bordo del viaje de tus sueños con Santal! Gracias por registrarte en nuestra gran promoción. Esta es tu oportunidad de vivir unas vacaciones inolvidables en familia. Cada factura que registres es un paso más cerca de la aventura. La promoción estará activa hasta el *15 de septiembre del 2025*, ¡así que no te detengas! ¡Sigue disfrutando de tu Santal favorito!");
-            $wasapiAccount = WasapiAccount::first();
+            $wasapiService->sendText($capture->cell_phone, $wasapiAccount->final_message);
             return view('capture.completed', compact('capture', 'wasapiAccount'));
             
         } catch (\Illuminate\Validation\ValidationException $e) {
