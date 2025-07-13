@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Capture;
 use App\Models\CaptureImage;
+use App\Models\WasapiAccount;
 use App\Services\WasapiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -93,8 +94,8 @@ class CaptureController extends Controller
 
             $wasapiService = new WasapiService();
             $wasapiService->sendText($capture->cell_phone, "¡Tu registro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
-
-            return view('capture.completed', compact('capture'));
+            $wasapiAccount = WasapiAccount::first();
+            return view('capture.completed', compact('capture', 'wasapiAccount'));
             
         } catch (\Illuminate\Validation\ValidationException $e) {
           Log::error('Error al procesar la imagen: ' . $e->getMessage());
