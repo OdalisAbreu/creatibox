@@ -16,19 +16,11 @@ class CaptureController extends Controller
     {
 
         $capture = Capture::where('cell_phone', $cell_phone)->first();
-
-        if ($capture) {
-            abort(409, 'Duplicate capture');
-        }
-
+    
         // limpiar el texto del $request->card_id para que solo contenga números y no contenga espacios
         $card_id = preg_replace('/\s+/', '', $request->card_id);
         $card_id = preg_replace('/\D/', '', $card_id);
-        // verificar que el $request->card_id contenga solo números
-
-
-        //    $path = $request->file('invoice_image')->store("public/invoices/");
-
+    
         Capture::create([
             'cell_phone' => $cell_phone,
             'name' => $request->name,
