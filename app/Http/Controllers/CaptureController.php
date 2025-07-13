@@ -52,33 +52,53 @@ class CaptureController extends Controller
     public function showForm($cell_phone)
     {
         $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail()->load('images');
-        // if ($capture->completed) {
-        //     return view('capture.completed');
-        // }
+        
+        // Si ya tiene una imagen, redirigir a la página de completado
+        if ($capture->images()->exists()) {
+            return view('capture.completed', compact('capture'));
+        }
 
         return view('capture.form', compact('capture'));
     }
 
     public function submitImage(Request $request, $cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
+        try {
+            // Validar que se envíe una imagen
+            $request->validate([
+                'invoice_image' => 'required|image|max:3072' // 3MB máximo
+            ]);
 
-        // Guarda en storage/app/public/invoices y retorna el path relativo
-        $path = $request->file('invoice_image')->store("invoices", 'public');
+            $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
 
-        // Guarda el path accesible públicamente con Storage::url()
-        CaptureImage::create([
-            'capture_id' => $capture->id,
-            'image_path' => $path,
-        ]);
-        $capture->update([
-            'completed' => true,
-        ]);
+            // Verificar si ya tiene una imagen
+            if ($capture->images()->exists()) {
+                return redirect()->back()->with('error', 'Ya tienes una factura registrada.');
+            }
 
-        $wasapiService = new WasapiService();
-        $wasapiService->sendText($capture->cell_phone, "¡Tu registro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
+            // Guarda en storage/app/public/invoices y retorna el path relativo
+            $path = $request->file('invoice_image')->store("invoices", 'public');
 
-        return view('capture.completed', compact('capture'));
+            // Guarda el path accesible públicamente con Storage::url()
+            CaptureImage::create([
+                'capture_id' => $capture->id,
+                'image_path' => $path,
+            ]);
+            
+            $capture->update([
+                'completed' => true,
+            ]);
+
+            $wasapiService = new WasapiService();
+            $wasapiService->sendText($capture->cell_phone, "¡Tu registro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
+
+            return view('capture.completed', compact('capture'));
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al procesar la imagen. Por favor, intenta nuevamente.');
+        }
     }
 
 
