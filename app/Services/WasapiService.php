@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WasapiService
 {
@@ -28,6 +29,7 @@ class WasapiService
      */
     public function sendText(string $waId, string $message): array
     {
+        try {
         $endpoint = "{$this->baseUrl}/whatsapp-messages";
 
         $payload = [
@@ -43,5 +45,9 @@ class WasapiService
             ->throw();
 
         return $response->json();
+        } catch (\Exception $e) {
+            Log::error('Error al enviar mensaje: ' . $e->getMessage());
+            return [];
+        }
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Capture;
 use App\Models\CaptureImage;
 use App\Services\WasapiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CaptureController extends Controller
 {
@@ -95,10 +96,9 @@ class CaptureController extends Controller
             return view('capture.completed', compact('capture'));
             
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()->withErrors($e->validator)->withInput();
-        } catch (\Exception $e) {
+          Log::error('Error al procesar la imagen: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al procesar la imagen. Por favor, intenta nuevamente.');
-        }
+        } 
     }
 
 
