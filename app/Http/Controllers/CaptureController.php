@@ -91,9 +91,14 @@ class CaptureController extends Controller
             $capture->update([
                 'completed' => true,
             ]);
-            $wasapiAccount = WasapiAccount::first();
+            
+          //  $wasapiAccount = WasapiAccount::first();
+            //$wasapiService = new WasapiService();
+           // $wasapiService->sendText($wasapiAccount->phone, $wasapiAccount->final_message);
+          
+
             $wasapiService = new WasapiService();
-            $wasapiService->sendText($wasapiAccount->phone, $wasapiAccount->final_message);
+            $wasapiService->sendText($capture->cell_phone, "Ya estás a bordo del viaje de tus sueños con Santal! Gracias por registrarte en nuestra gran promoción. Esta es tu oportunidad de vivir unas vacaciones inolvidables en familia. Cada factura que registres es un paso más cerca de la aventura. La promoción estará activa hasta el *15 de septiembre del 2025*, ¡así que no te detengas! ¡Sigue disfrutando de tu Santal favorito!");
             $wasapiAccount = WasapiAccount::first();
             return view('capture.completed', compact('capture', 'wasapiAccount'));
             
