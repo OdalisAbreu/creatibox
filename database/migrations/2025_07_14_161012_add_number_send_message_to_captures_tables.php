@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('captures_tables', function (Blueprint $table) {
+        Schema::table('captures', function (Blueprint $table) {
             $table->string('number_send_message')->nullable();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('captures_tables', function (Blueprint $table) {
+        Schema::table('captures', function (Blueprint $table) {
             $table->dropColumn('number_send_message');
         });
     }

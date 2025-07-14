@@ -43,7 +43,7 @@ class CaptureController extends Controller
 
     public function showForm($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail()->load('images');
+        $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail()->load('images');
         
         // Si ya tiene una imagen, redirigir a la página de completado
         $wasapiAccount = WasapiAccount::first();
@@ -59,7 +59,7 @@ class CaptureController extends Controller
                 'invoice_image' => 'required|image|max:5072' // 3MB máximo
             ]);
 
-            $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
+            $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail();
 
 
             // Guarda en storage/app/public/invoices y retorna el path relativo
