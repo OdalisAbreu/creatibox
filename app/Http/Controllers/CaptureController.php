@@ -18,7 +18,7 @@ class CaptureController extends Controller
         $capture = Capture::where('cell_phone', $cell_phone)->first();
     
         if ($capture) {
-            $cell_phone = $request->contact_number ?? $cell_phone;
+            $phone = $request->contact_number ?? $cell_phone;
         }
 
         // limpiar el texto del $request->card_id para que solo contenga números y no contenga espacios
@@ -28,7 +28,7 @@ class CaptureController extends Controller
 
     
         Capture::create([
-            'cell_phone' => $cell_phone,
+            'cell_phone' => $phone,
             'name' => $request->name,
             'last_name' => $request->last_name ?? '',
             'invoice_number' => $request->invoice_number,
@@ -36,7 +36,8 @@ class CaptureController extends Controller
             'city' => $request->city ?? '',
             'storage' => $request->storage ?? '',
             'card_id' => $card_id,
-            'completed' => false
+            'completed' => false,
+            'number_send_message' => $cell_phone,
         ]);
     }
 
@@ -78,7 +79,7 @@ class CaptureController extends Controller
            $wasapiAccount = WasapiAccount::first();
 //return $wasapiAccount->final_message;
             $wasapiService = new WasapiService();
-            $wasapiService->sendText($capture->cell_phone, $wasapiAccount->final_message);
+            $wasapiService->sendText($capture->number_send_message ?? $capture->cell_phone, $wasapiAccount->final_message);
             return view('capture.completed', compact('capture', 'wasapiAccount'));
             
         } catch (\Illuminate\Validation\ValidationException $e) {

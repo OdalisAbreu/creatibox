@@ -18,6 +18,7 @@ class Capture extends Model
         'contact_number',
         'card_id',
         'completed',
+        'number_send_message',
     ];
     public function images()
     {
