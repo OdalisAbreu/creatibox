@@ -405,6 +405,12 @@
     </div>
 
     <!--------------------------------------------------------------------------------------->
+    <!---Cambia la clase container para que tenga menos padding--->
+    <style>
+        .container {
+            padding: 0 0 !important;
+        }
+    </style>
 
     <!-- JS: cargar imagen + cerrar al hacer clic fuera -->
     <script>
