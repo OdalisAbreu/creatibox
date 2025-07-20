@@ -46,19 +46,19 @@
 
         <!-- Filtros generales -->
         <form method="GET" class="d-flex align-items-center mb-4">
-            <div class="me-3">
-                <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Buscar por nombre">
+            <div class="me-2">
+                <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Nombre">
             </div>
-            <div class="me-3">
-                <input type="text" name="cell_phone" value="{{ request('cell_phone') }}" class="form-control" placeholder="Buscar por celular">
+            <div class="me-2">
+                <input type="text" name="cell_phone" value="{{ request('cell_phone') }}" class="form-control" placeholder="Celular">
             </div>
-            <div class="me-3">
+            <div class="me-2">
                 <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" placeholder="Fecha inicio">
             </div>
-            <div class="me-3">
+            <div class="me-2">
                 <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" placeholder="Fecha fin">
             </div>
-            <div class="me-3">
+            <div class="me-3" style="min-width: 150px;">
                 <select name="status" class="form-control">
                     <option value="">Estados</option>
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completados</option>
