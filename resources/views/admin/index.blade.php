@@ -121,6 +121,19 @@
                         </td>
                         <td>
                             <div class="d-flex align-items-center justify-content-center gap-2">
+                                <!-- Botón de editar -->
+                                <button type="button"
+                                    class="btn btn-warning d-flex justify-content-center align-items-center edit-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    data-id="{{ $capture->id }}"
+                                    style="width: 50px; height: 50px;"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Editar registro">
+                                    <i class="fas fa-edit" style="font-size: 1.5rem; color: white;"></i>
+                                </button>
+
                                 <!-- Botón de eliminar -->
                                 @if ($capture->image_id)
                                 <button type="button"
@@ -337,6 +350,62 @@
 
     <!--------------------------------------------------------------------------------------->
 
+    <!-- Modal para editar participante -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Participante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="editErrors" class="alert alert-danger" style="display: none;">
+                            <ul class="mb-0" id="editErrorsList"></ul>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_invoice_number" class="form-label">Número de Factura</label>
+                            <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="edit_last_name" name="last_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_card_id" class="form-label">Cédula</label>
+                            <input type="text" class="form-control" id="edit_card_id" name="card_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cell_phone" class="form-label">Celular</label>
+                            <input type="text" class="form-control" id="cell_phone" name="cell_phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_contact_number" class="form-label">Número de Contacto</label>
+                            <input type="text" class="form-control" id="edit_contact_number" name="contact_number">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_city" class="form-label">Ciudad</label>
+                            <input type="text" class="form-control" id="edit_city" name="city" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_storage" class="form-label">Almacén</label>
+                            <input type="text" class="form-control" id="edit_storage" name="storage" required>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--------------------------------------------------------------------------------------->
+
     <!-- JS: cargar imagen + cerrar al hacer clic fuera -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -389,6 +458,238 @@
                     captureIdInput.value = captureId;
                 });
             });
+
+            // Funcionalidad para editar
+            const editButtons = document.querySelectorAll('.edit-btn');
+            const editForm = document.getElementById('editForm');
+            const editErrors = document.getElementById('editErrors');
+            const editErrorsList = document.getElementById('editErrorsList');
+
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const captureId = this.getAttribute('data-id');
+                    
+                    // Mostrar indicador de carga
+                    const modal = document.getElementById('editModal');
+                    const modalBody = modal.querySelector('.modal-body');
+                    modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
+                    
+                    // Cargar datos del registro
+                    fetch(`/admin/edit/${captureId}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al cargar los datos');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Restaurar el contenido del modal
+                            modalBody.innerHTML = `
+                                <div id="editErrors" class="alert alert-danger" style="display: none;">
+                                    <ul class="mb-0" id="editErrorsList"></ul>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_invoice_number" class="form-label">Número de Factura</label>
+                                    <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" value="${data.invoice_number}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_name" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="edit_name" name="name" value="${data.name}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_last_name" class="form-label">Apellido</label>
+                                    <input type="text" class="form-control" id="edit_last_name" name="last_name" value="${data.last_name}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_card_id" class="form-label">Cédula</label>
+                                    <input type="text" class="form-control" id="edit_card_id" name="card_id" value="${data.card_id}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_cell_phone" class="form-label">Celular</label>
+                                    <input type="text" class="form-control" id="edit_cell_phone" name="cell_phone" value="${data.cell_phone}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_contact_number" class="form-label">Número de Contacto</label>
+                                    <input type="text" class="form-control" id="edit_contact_number" name="contact_number" value="${data.contact_number || ''}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_city" class="form-label">Ciudad</label>
+                                    <input type="text" class="form-control" id="edit_city" name="city" value="${data.city}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_storage" class="form-label">Almacén</label>
+                                    <input type="text" class="form-control" id="edit_storage" name="storage" value="${data.storage}" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" onclick="submitEditForm('${captureId}')">Actualizar</button>
+                                </div>
+                            `;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar los datos del registro. Por favor, inténtalo de nuevo.</div>';
+                        });
+                });
+            });
+
+            // Manejar envío del formulario de edición usando delegación de eventos
+            document.addEventListener('submit', function(e) {
+                console.log('Evento submit capturado:', e.target.id);
+                
+                if (e.target.id === 'editForm') {
+                    e.preventDefault();
+                    console.log('Formulario de edición detectado');
+                    
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Actualizando...';
+                    submitBtn.disabled = true;
+                    
+                    const formData = new FormData(e.target);
+                    
+                    // Debug: mostrar los datos que se van a enviar
+                    console.log('Datos a enviar:');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key + ': ' + value);
+                    }
+                    
+                    console.log('URL de destino:', e.target.action);
+                    
+                    fetch(e.target.action, {
+                        method: 'PUT',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => {
+                        console.log('Respuesta recibida:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Datos de respuesta:', data);
+                        if (data.success) {
+                            // Mostrar mensaje de éxito
+                            alert(data.message);
+                            // Recargar la página para mostrar los cambios
+                            location.reload();
+                        } else {
+                            // Mostrar errores
+                            const editErrors = document.getElementById('editErrors');
+                            const editErrorsList = document.getElementById('editErrorsList');
+                            if (editErrors && editErrorsList) {
+                                editErrors.style.display = 'block';
+                                editErrorsList.innerHTML = '';
+                                if (data.message) {
+                                    const li = document.createElement('li');
+                                    li.textContent = data.message;
+                                    editErrorsList.appendChild(li);
+                                }
+                            } else {
+                                alert(data.message || 'Error al actualizar el registro');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en fetch:', error);
+                        alert('Error al actualizar el registro. Por favor, inténtalo de nuevo.');
+                    })
+                    .finally(() => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    });
+                }
+            });
+            
+            // También agregar un listener específico para el modal de edición
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.closest('#editModal')) {
+                    const form = e.target.closest('#editModal').querySelector('form');
+                    if (form && !form.hasAttribute('data-submit-listener')) {
+                        form.setAttribute('data-submit-listener', 'true');
+                        form.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            console.log('Submit desde modal detectado');
+                            
+                            const formData = new FormData(this);
+                            console.log('Datos del modal:');
+                            for (let [key, value] of formData.entries()) {
+                                console.log(key + ': ' + value);
+                            }
+                            
+                            fetch(this.action, {
+                                method: 'PUT',
+                                body: formData,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert(data.message);
+                                    location.reload();
+                                } else {
+                                    alert(data.message || 'Error al actualizar');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Error al actualizar el registro');
+                            });
+                        });
+                    }
+                }
+            });
         });
+        
+        // Función global para enviar el formulario de edición
+        function submitEditForm(captureId) {
+            console.log('Función submitEditForm llamada con ID:', captureId);
+            
+            const modal = document.getElementById('editModal');
+            const formData = new FormData();
+            
+            // Recopilar datos del modal
+            const inputs = modal.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.name && input.value) {
+                    formData.append(input.name, input.value);
+                    console.log('Agregando campo:', input.name, '=', input.value);
+                }
+            });
+            
+            // Agregar CSRF token
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+            formData.append('_method', 'PUT');
+            
+            console.log('Enviando datos a:', `/admin/update/${captureId}`);
+            
+            fetch(`/admin/update/${captureId}`, {
+                method: 'POST', // Usar POST para que funcione con FormData
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => {
+                console.log('Respuesta recibida:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Datos de respuesta:', data);
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error al actualizar el registro');
+                }
+            })
+            .catch(error => {
+                console.error('Error en fetch:', error);
+                alert('Error al actualizar el registro. Por favor, inténtalo de nuevo.');
+            });
+        }
     </script>
 </x-app-layout>

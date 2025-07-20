@@ -9,6 +9,7 @@ use App\Models\CaptureImage;
 
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as MPDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -235,14 +236,85 @@ class AdminController extends Controller
                 'image_path' => $path
             ]);
 
-            return redirect()->route('dashboard')->with('success', 'Participante creado correctamente.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['cell_phone' => 'Este número de celular ya está registrado.']);
-            }
-            throw $e;
+                    return redirect()->route('dashboard')->with('success', 'Participante creado correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+        if ($e->getCode() == 23000) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['cell_phone' => 'Este número de celular ya está registrado.']);
         }
+        throw $e;
     }
+}
+
+public function editCapture($id)
+{
+    $capture = Capture::findOrFail($id);
+    return response()->json($capture);
+}
+
+public function updateCapture(Request $request, $id)
+{
+    Log::info('Método updateCapture llamado con ID:', ['id' => $id]);
+    
+    try {
+        $capture = Capture::findOrFail($id);
+        
+        // Validar campos requeridos
+        if (!$request->filled('cell_phone')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El campo celular es requerido.'
+            ], 422);
+        }
+        
+        // Validar que el celular no esté duplicado (excluyendo el registro actual)
+        $existingCapture = Capture::where('cell_phone', $request->cell_phone)
+            ->where('id', '!=', $id)
+            ->first();
+            
+        if ($existingCapture) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este número de celular ya está registrado.'
+            ], 422);
+        }
+
+        // Limpiar el card_id para que solo contenga números
+        $card_id = $request->filled('card_id') ? preg_replace('/\s+/', '', $request->card_id) : '';
+        $card_id = preg_replace('/\D/', '', $card_id);
+
+        // Preparar datos para actualizar
+        $updateData = [
+            'name' => $request->name ?? '',
+            'last_name' => $request->last_name ?? '',
+            'invoice_number' => $request->invoice_number ?? '',
+            'cell_phone' => $request->cell_phone,
+            'contact_number' => $request->contact_number ?? '',
+            'city' => $request->city ?? '',
+            'storage' => $request->storage ?? '',
+            'card_id' => $card_id,
+        ];
+        
+        // Log para debug
+        Log::info('Datos a actualizar:', $updateData);
+
+        $capture->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registro actualizado correctamente.'
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error en updateCapture:', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al actualizar el registro: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
