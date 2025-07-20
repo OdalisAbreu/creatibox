@@ -58,6 +58,13 @@
             <div class="me-3">
                 <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" placeholder="Fecha fin">
             </div>
+            <div class="me-3">
+                <select name="status" class="form-control">
+                    <option value="">Estados</option>
+                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completados</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendientes</option>
+                </select>
+            </div>
             <div class="me-2">
                 <button type="submit" class="btn btn-primary me-2">🔍 Filtrar</button>
             </div>

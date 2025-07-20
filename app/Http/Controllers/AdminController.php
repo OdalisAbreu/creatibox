@@ -42,8 +42,16 @@ class AdminController extends Controller
             $query->whereDate('captures.created_at', '<=', $request->end_date);
         }
 
+        if ($request->filled('status')) {
+            if ($request->status === 'completed') {
+                $query->where('captures.completed', 1);
+            } elseif ($request->status === 'pending') {
+                $query->where('captures.completed', 0);
+            }
+        }
+
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date')) {
+        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -106,8 +114,16 @@ class AdminController extends Controller
             $query->whereDate('captures.created_at', '<=', $request->end_date);
         }
 
+        if ($request->filled('status')) {
+            if ($request->status === 'completed') {
+                $query->where('captures.completed', 1);
+            } elseif ($request->status === 'pending') {
+                $query->where('captures.completed', 0);
+            }
+        }
+
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date')) {
+        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
