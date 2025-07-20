@@ -409,6 +409,7 @@
     <style>
         .container {
             padding: 0 0 !important;
+            max-width: 1024px !important;
         }
     </style>
 
