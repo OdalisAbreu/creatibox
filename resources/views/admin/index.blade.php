@@ -94,7 +94,7 @@
                 <tbody>
                     @foreach ($captures as $capture)
                     <tr>
-                        <td><a href="/capture/{{ $capture->cell_phone }}">{{ $capture->invoice_number }}</a></td>
+                        <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->invoice_number }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->invoice_number, 20) }}</a></td>
                         <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
                         <td title="{{ $capture->last_name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->last_name, 15) }}</td>
                         <td>{{ $capture->card_id }}</td>
