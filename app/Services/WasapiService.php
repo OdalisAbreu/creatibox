@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\WasapiAccount;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WasapiService
 {
@@ -12,9 +14,10 @@ class WasapiService
 
     public function __construct()
     {
+        $wasapiAccount = WasapiAccount::first();
         $this->baseUrl = config('services.wasapi.url');
-        $this->token   = config('services.wasapi.token');
-        $this->fromId  = config('services.wasapi.from_id');
+        $this->token   = $wasapiAccount->token;
+        $this->fromId  = $wasapiAccount->wasapi_id;
     }
 
     /**
@@ -28,6 +31,7 @@ class WasapiService
      */
     public function sendText(string $waId, string $message): array
     {
+        try {
         $endpoint = "{$this->baseUrl}/whatsapp-messages";
 
         $payload = [
@@ -43,5 +47,9 @@ class WasapiService
             ->throw();
 
         return $response->json();
+        } catch (\Exception $e) {
+            Log::error('Error al enviar mensaje: ' . $e->getMessage());
+            return [];
+        }
     }
 }

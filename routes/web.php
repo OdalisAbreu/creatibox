@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CaptureController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 
 
 Route::middleware('auth')->group(function () {
@@ -19,6 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteCapture'])->name('admin.deleteCapture');
     Route::post('/admin/upload-image', [AdminController::class, 'uploadImage'])->name('admin.uploadImage');
     Route::post('/admin/store-capture', [AdminController::class, 'storeCapture'])->name('admin.storeCapture');
+    Route::get('/admin/edit/{id}', [AdminController::class, 'editCapture'])->name('admin.editCapture');
+    Route::match(['PUT', 'POST'], '/admin/update/{id}', [AdminController::class, 'updateCapture'])->name('admin.updateCapture');
+    Route::get('/admin/test-log', function() {
+        Log::info('Prueba de logging funcionando');
+        return response()->json(['message' => 'Log funcionando']);
+    });
 });
 
 require __DIR__ . '/auth.php';

@@ -4,76 +4,88 @@ namespace App\Http\Controllers;
 
 use App\Models\Capture;
 use App\Models\CaptureImage;
+use App\Models\WasapiAccount;
 use App\Services\WasapiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CaptureController extends Controller
 {
 
     public function store(Request $request, $cell_phone)
     {
-        // $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'email' => 'required|email',
-        //     'gender' => 'required|in:male,female,other',
-        //     'age' => 'required|integer|min:0',
-        //     'card_id' => 'required|string|max:255'
-        // ]);
 
         $capture = Capture::where('cell_phone', $cell_phone)->first();
-
+    
         if ($capture) {
-            abort(409, 'Duplicate capture');
+            $phone = $request->contact_number ?? $cell_phone;
         }
 
         // limpiar el texto del $request->card_id para que solo contenga números y no contenga espacios
         $card_id = preg_replace('/\s+/', '', $request->card_id);
         $card_id = preg_replace('/\D/', '', $card_id);
-        // verificar que el $request->card_id contenga solo números
 
 
-        //    $path = $request->file('invoice_image')->store("public/invoices/");
-
+    
         Capture::create([
-            'cell_phone' => $cell_phone,
+            'cell_phone' => $phone ?? $cell_phone,
             'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'age' => $request->age,
-            'card_id' => $card_id
+            'last_name' => $request->last_name ?? '',
+            'invoice_number' => $request->invoice_number,
+            'contact_number' => $request->contact_number ?? $cell_phone,
+            'city' => $request->city ?? '',
+            'storage' => $request->storage ?? '',
+            'card_id' => $card_id,
+            'completed' => false,
+            'number_send_message' => $cell_phone,
         ]);
     }
 
     public function showForm($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail()->load('images');
-        // if ($capture->completed) {
-        //     return view('capture.completed');
-        // }
-
-        return view('capture.form', compact('capture'));
+        $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail()->load('images');
+        
+        // Si ya tiene una imagen, redirigir a la página de completado
+        $wasapiAccount = WasapiAccount::first();
+        return view('capture.form', compact('capture', 'wasapiAccount'));
     }
 
     public function submitImage(Request $request, $cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->firstOrFail();
+        Log::info('submitImage', ['request' => $request->all()]);
+        try {
+            // Validar que se envíe una imagen
+            $request->validate([
+                'invoice_image' => 'required|image|max:5072' // 3MB máximo
+            ]);
 
-        // Guarda en storage/app/public/invoices y retorna el path relativo
-        $path = $request->file('invoice_image')->store("invoices", 'public');
+            $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail();
 
-        // Guarda el path accesible públicamente con Storage::url()
-        CaptureImage::create([
-            'capture_id' => $capture->id,
-            'image_path' => $path,
-        ]);
-        $capture->update([
-            'completed' => true,
-        ]);
 
-        $wasapiService = new WasapiService();
-        $wasapiService->sendText($capture->cell_phone, "¡Tu registro fue completado de manera exitosa!  🥳🥳🥳\n\nYa estas participando🎉");
+            // Guarda en storage/app/public/invoices y retorna el path relativo
+            $path = $request->file('invoice_image')->store("invoices", 'public');
 
-        return view('capture.completed', compact('capture'));
+            // Guarda el path accesible públicamente con Storage::url()
+            CaptureImage::create([
+                'capture_id' => $capture->id,
+                'image_path' => $path,
+            ]);
+            
+            $capture->update([
+                'completed' => true,
+            ]);
+            
+          
+           $wasapiAccount = WasapiAccount::first();
+//return $wasapiAccount->final_message;
+            $wasapiService = new WasapiService();
+            $wasapiService->sendText($capture->number_send_message ?? $capture->cell_phone, $wasapiAccount->final_message);
+            return view('capture.completed', compact('capture', 'wasapiAccount'));
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+          Log::error('Error al procesar la imagen: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al procesar la imagen. Por favor, intenta nuevamente.');
+        } 
     }
 
 

@@ -11,11 +11,14 @@ class Capture extends Model
     protected $fillable = [
         'cell_phone',
         'name',
-        'email',
-        'gender',
-        'age',
+        'last_name',
+        'city',
+        'storage',
+        'invoice_number',
+        'contact_number',
         'card_id',
         'completed',
+        'number_send_message',
     ];
     public function images()
     {

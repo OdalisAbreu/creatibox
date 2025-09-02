@@ -9,6 +9,7 @@ use App\Models\CaptureImage;
 
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as MPDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -42,8 +43,16 @@ class AdminController extends Controller
             $query->whereDate('captures.created_at', '<=', $request->end_date);
         }
 
+        if ($request->filled('status')) {
+            if ($request->status === 'completed') {
+                $query->where('captures.completed', 1);
+            } elseif ($request->status === 'pending') {
+                $query->where('captures.completed', 0);
+            }
+        }
+
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date')) {
+        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -74,7 +83,17 @@ class AdminController extends Controller
     {
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
-                'captures.*',
+                'captures.id',
+                'captures.invoice_number',
+                'captures.name',
+                'captures.last_name',
+                'captures.card_id',
+                'captures.cell_phone',
+                'captures.contact_number',
+                'captures.city',
+                'captures.storage',
+                'captures.completed',
+                'captures.created_at',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado")
             );
@@ -96,8 +115,16 @@ class AdminController extends Controller
             $query->whereDate('captures.created_at', '<=', $request->end_date);
         }
 
+        if ($request->filled('status')) {
+            if ($request->status === 'completed') {
+                $query->where('captures.completed', 1);
+            } elseif ($request->status === 'pending') {
+                $query->where('captures.completed', 0);
+            }
+        }
+
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date')) {
+        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -134,9 +161,10 @@ class AdminController extends Controller
                 'captures.id',
                 'captures.name',
                 'captures.cell_phone',
-                'captures.email',
-                'captures.gender',
-                'captures.age',
+                'captures.last_name',
+                'captures.contact_number',
+                'captures.city',
+                'captures.storage',
                 'captures.card_id',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
@@ -172,7 +200,7 @@ class AdminController extends Controller
     public function storeCapture(Request $request)
     {
         try {
-            $request->validate([
+         /*   $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email',
                 'gender' => 'required|in:male,female,other',
@@ -180,7 +208,7 @@ class AdminController extends Controller
                 'card_id' => 'required|string|max:255',
                 'cell_phone' => 'required|string|max:255|unique:captures,cell_phone',
                 'invoice_image' => 'required|image|max:2048'
-            ]);
+            ]);*/
 
             // Limpiar el card_id para que solo contenga números
             $card_id = preg_replace('/\s+/', '', $request->card_id);
@@ -190,9 +218,11 @@ class AdminController extends Controller
             $capture = Capture::create([
                 'cell_phone' => $request->cell_phone,
                 'name' => $request->name,
-                'email' => $request->email,
-                'gender' => $request->gender,
-                'age' => $request->age,
+                'last_name' => $request->last_name ?? '',
+                'invoice_number' => $request->invoice_number,
+                'contact_number' => $request->contact_number ?? $request->cell_phone,
+                'city' => $request->city ?? '',
+                'storage' => $request->storage ?? '',
                 'card_id' => $card_id,
                 'completed' => true
             ]);
@@ -206,14 +236,85 @@ class AdminController extends Controller
                 'image_path' => $path
             ]);
 
-            return redirect()->route('dashboard')->with('success', 'Participante creado correctamente.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['cell_phone' => 'Este número de celular ya está registrado.']);
-            }
-            throw $e;
+                    return redirect()->route('dashboard')->with('success', 'Participante creado correctamente.');
+    } catch (\Illuminate\Database\QueryException $e) {
+        if ($e->getCode() == 23000) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['cell_phone' => 'Este número de celular ya está registrado.']);
         }
+        throw $e;
     }
+}
+
+public function editCapture($id)
+{
+    $capture = Capture::findOrFail($id);
+    return response()->json($capture);
+}
+
+public function updateCapture(Request $request, $id)
+{
+    Log::info('Método updateCapture llamado con ID:', ['id' => $id]);
+    
+    try {
+        $capture = Capture::findOrFail($id);
+        
+        // Validar campos requeridos
+        if (!$request->filled('cell_phone')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El campo celular es requerido.'
+            ], 422);
+        }
+        
+        // Validar que el celular no esté duplicado (excluyendo el registro actual)
+        $existingCapture = Capture::where('cell_phone', $request->cell_phone)
+            ->where('id', '!=', $id)
+            ->first();
+            
+        if ($existingCapture) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este número de celular ya está registrado.'
+            ], 422);
+        }
+
+        // Limpiar el card_id para que solo contenga números
+        $card_id = $request->filled('card_id') ? preg_replace('/\s+/', '', $request->card_id) : '';
+        $card_id = preg_replace('/\D/', '', $card_id);
+
+        // Preparar datos para actualizar
+        $updateData = [
+            'name' => $request->name ?? '',
+            'last_name' => $request->last_name ?? '',
+            'invoice_number' => $request->invoice_number ?? '',
+            'cell_phone' => $request->cell_phone,
+            'contact_number' => $request->contact_number ?? '',
+            'city' => $request->city ?? '',
+            'storage' => $request->storage ?? '',
+            'card_id' => $card_id,
+        ];
+        
+        // Log para debug
+        Log::info('Datos a actualizar:', $updateData);
+
+        $capture->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registro actualizado correctamente.'
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error en updateCapture:', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al actualizar el registro: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

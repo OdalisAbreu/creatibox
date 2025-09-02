@@ -125,7 +125,7 @@
             <p>Ya hemos recibido tu factura. Muchas gracias.</p>
 
             {{-- Botón volver a WhatsApp --}}
-            <a href="https://wa.me/18098510363" class="whatsapp-btn" target="_blank" rel="noopener">
+            <a href="https://wa.me/{{ $wasapiAccount->phone }}"  class="whatsapp-btn" target="_blank" rel="noopener">
                 <i class="bi bi-whatsapp"></i>
                 Volver a WhatsApp
             </a>
@@ -149,7 +149,7 @@
 
         //  Redirección automática tras 5 s
         setTimeout(() => {
-            window.location.href = 'https://wa.me/18098510363';
+            window.location.href = 'https://wa.me/{{ $wasapiAccount->phone }}';
         }, 5000);
     </script>
 </body>

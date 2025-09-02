@@ -73,29 +73,28 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Número de Factura</th>
                 <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Género</th>
-                <th>Edad</th>
+                <th>Apellido</th>
                 <th>Cédula</th>
-                <th>Imagen</th>
-                <th>Estado</th>
+                <th>Número de Contacto</th>
+                <th>Ciudad</th>
+                <th>Establecimiento </th>
                 <th>Fecha Registro</th>
-                <th>Fecha Factura</th>
+                <th>Imagen</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($captures as $capture)
             <tr>
-                <td>{{ $capture->id }}</td>
+                <td>{{ $capture->invoice_number }}</td>
                 <td>{{ $capture->name }}</td>
-                <td>{{ $capture->cell_phone }}</td>
-                <td>{{ $capture->email }}</td>
-                <td>{{ ucfirst($capture->gender) }}</td>
-                <td>{{ $capture->age }}</td>
+                <td>{{ $capture->last_name }}</td>
                 <td>{{ $capture->card_id }}</td>
+                <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
+                <td>{{ $capture->city }}</td>
+                <td>{{ $capture->storage }}</td>
+                <td> {{ $capture->created_at->format('d/m/Y') }}</td>
                 <td>
                     @php
                         $path = $capture->image_path;
@@ -106,13 +105,6 @@
                             width="80" height="80" />
                     @else
                         <span>Imagen no disponible</span>
-                    @endif
-                </td>
-                <td>{{ $capture->estado }}</td>
-                <td>{{ \Carbon\Carbon::parse($capture->created_at)->format('d/m/Y H:i') }}</td>
-                <td>
-                    @if($capture->invoice_created_at)
-                    {{ \Carbon\Carbon::parse($capture->invoice_created_at)->format('d/m/Y H:i') }}
                     @endif
                 </td>
             </tr>
