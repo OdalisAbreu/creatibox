@@ -81,7 +81,7 @@
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>No. Factura</th>
+                        <th>No.</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
                         <th>Card ID</th>
@@ -94,7 +94,7 @@
                 <tbody>
                     @foreach ($captures as $capture)
                     <tr>
-                        <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->invoice_number }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->invoice_number, 20) }}</a></td>
+                        <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->id }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->id, 20) }}</a></td>
                         <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
                         <td title="{{ $capture->last_name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->last_name, 15) }}</td>
                         <td>{{ $capture->card_id }}</td>
@@ -274,13 +274,13 @@
                             </ul>
                         </div>
                         @endif
-                        <div class="mb-3">
+<!--                        <div class="mb-3">
                             <label for="invoice_number" class="form-label">Número de Factura</label>
                             <input type="text" class="form-control @error('invoice_number') is-invalid @enderror" id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}" required>
                             @error('invoice_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div>-->
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre</label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
@@ -325,7 +325,7 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="storage" class="form-label">Almacén</label>
+                            <label for="storage" class="form-label">Tienda</label>
                             <input type="text" class="form-control @error('storage') is-invalid @enderror" id="storage" name="storage" value="{{ old('storage') }}" required>
                             @error('storage')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -365,10 +365,10 @@
                         <div id="editErrors" class="alert alert-danger" style="display: none;">
                             <ul class="mb-0" id="editErrorsList"></ul>
                         </div>
-                        <div class="mb-3">
+<!--                        <div class="mb-3">
                             <label for="edit_invoice_number" class="form-label">Número de Factura</label>
                             <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" required>
-                        </div>
+                        </div>-->
                         <div class="mb-3">
                             <label for="edit_name" class="form-label">Nombre</label>
                             <input type="text" class="form-control" id="edit_name" name="name" required>
@@ -394,7 +394,7 @@
                             <input type="text" class="form-control" id="edit_city" name="city" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit_storage" class="form-label">Almacén</label>
+                            <label for="edit_storage" class="form-label">Tienda</label>
                             <input type="text" class="form-control" id="edit_storage" name="storage" required>
                         </div>
                     </div>
@@ -495,10 +495,10 @@
                                 <div id="editErrors" class="alert alert-danger" style="display: none;">
                                     <ul class="mb-0" id="editErrorsList"></ul>
                                 </div>
-                                <div class="mb-3">
+<!--                                <div class="mb-3">
                                     <label for="edit_invoice_number" class="form-label">Número de Factura</label>
-                                    <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" value="${data.invoice_number}" required>
-                                </div>
+                                    <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" value="${data.id}" required>
+                                </div>-->
                                 <div class="mb-3">
                                     <label for="edit_name" class="form-label">Nombre</label>
                                     <input type="text" class="form-control" id="edit_name" name="name" value="${data.name}" required>
@@ -524,7 +524,7 @@
                                     <input type="text" class="form-control" id="edit_city" name="city" value="${data.city}" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="edit_storage" class="form-label">Almacén</label>
+                                    <label for="edit_storage" class="form-label">Tienda</label>
                                     <input type="text" class="form-control" id="edit_storage" name="storage" value="${data.storage}" required>
                                 </div>
                                 <div class="modal-footer">

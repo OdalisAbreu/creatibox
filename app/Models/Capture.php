@@ -14,7 +14,7 @@ class Capture extends Model
         'last_name',
         'city',
         'storage',
-        'invoice_number',
+      //  'invoice_number',
         'contact_number',
         'card_id',
         'completed',

@@ -84,7 +84,7 @@ class AdminController extends Controller
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
                 'captures.id',
-                'captures.invoice_number',
+             //   'captures.invoice_number',
                 'captures.name',
                 'captures.last_name',
                 'captures.card_id',
@@ -200,15 +200,7 @@ class AdminController extends Controller
     public function storeCapture(Request $request)
     {
         try {
-         /*   $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email',
-                'gender' => 'required|in:male,female,other',
-                'age' => 'required|integer|min:0',
-                'card_id' => 'required|string|max:255',
-                'cell_phone' => 'required|string|max:255|unique:captures,cell_phone',
-                'invoice_image' => 'required|image|max:2048'
-            ]);*/
+
 
             // Limpiar el card_id para que solo contenga números
             $card_id = preg_replace('/\s+/', '', $request->card_id);
@@ -219,7 +211,7 @@ class AdminController extends Controller
                 'cell_phone' => $request->cell_phone,
                 'name' => $request->name,
                 'last_name' => $request->last_name ?? '',
-                'invoice_number' => $request->invoice_number,
+             //   'invoice_number' => $request->invoice_number,
                 'contact_number' => $request->contact_number ?? $request->cell_phone,
                 'city' => $request->city ?? '',
                 'storage' => $request->storage ?? '',
@@ -288,7 +280,7 @@ public function updateCapture(Request $request, $id)
         $updateData = [
             'name' => $request->name ?? '',
             'last_name' => $request->last_name ?? '',
-            'invoice_number' => $request->invoice_number ?? '',
+           // 'invoice_number' => $request->invoice_number ?? '',
             'cell_phone' => $request->cell_phone,
             'contact_number' => $request->contact_number ?? '',
             'city' => $request->city ?? '',

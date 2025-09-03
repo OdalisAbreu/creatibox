@@ -73,7 +73,7 @@
     <table>
         <thead>
             <tr>
-                <th>Número de Factura</th>
+                <th>No.</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Cédula</th>
@@ -87,7 +87,7 @@
         <tbody>
             @foreach ($captures as $capture)
             <tr>
-                <td>{{ $capture->invoice_number }}</td>
+                <td>{{ $capture->id }}</td>
                 <td>{{ $capture->name }}</td>
                 <td>{{ $capture->last_name }}</td>
                 <td>{{ $capture->card_id }}</td>

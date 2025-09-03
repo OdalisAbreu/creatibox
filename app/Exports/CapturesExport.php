@@ -20,7 +20,7 @@ class CapturesExport implements FromCollection, WithHeadings
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
                 'captures.id',
-                'captures.invoice_number',
+            //    'captures.invoice_number',
                 'captures.name',
                 'captures.last_name',
                 'captures.card_id',
