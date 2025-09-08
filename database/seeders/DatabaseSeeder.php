@@ -28,7 +28,9 @@ class DatabaseSeeder extends Seeder
             'phone' => '18098510363',
             'token' => '25903|e6Gg8KcLHVeryRk6qQxAaUWBzDa9xDFkVqoj01Bz',
             'wasapi_id' => '11640',
-            'final_message' => '🧾✨ \n\n Tu participación en la promoción “Rumbo al Clásico 2026 con Schick” ha sido registrada exitosamente. \n\n 👉 Recuerda: Mientras más productos Schick compres y facturas registres, más oportunidades tendrás de ganar.',
+            'final_message' => '🧾✨  
+            Tu participación en la promoción “Rumbo al Clásico 2026 con Schick” ha sido registrada exitosamente. 
+             👉 Recuerda: Mientras más productos Schick compres y facturas registres, más oportunidades tendrás de ganar.',
         ]);
     }
 }
