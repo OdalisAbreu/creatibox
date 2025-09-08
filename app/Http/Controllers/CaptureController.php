@@ -75,11 +75,11 @@ class CaptureController extends Controller
                 'completed' => true,
             ]);
             
-          
-           $wasapiAccount = WasapiAccount::first();
+            $wasapiAccount = WasapiAccount::first();
+          $mensaje = "¡Factura recibida " . $capture->name . "! ". $wasapiAccount->final_message;
 //return $wasapiAccount->final_message;
             $wasapiService = new WasapiService();
-            $wasapiService->sendText($capture->number_send_message ?? $capture->cell_phone, $wasapiAccount->final_message);
+            $wasapiService->sendText($capture->number_send_message ?? $capture->cell_phone, $mensaje);
             return view('capture.completed', compact('capture', 'wasapiAccount'));
             
         } catch (\Illuminate\Validation\ValidationException $e) {
