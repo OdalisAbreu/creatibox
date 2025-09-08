@@ -86,7 +86,7 @@ class AdminController extends Controller
                 'captures.id',
              //   'captures.invoice_number',
                 'captures.name',
-                'captures.last_name',
+                'captures.gender',
                 'captures.card_id',
                 'captures.cell_phone',
                 'captures.contact_number',
@@ -161,7 +161,7 @@ class AdminController extends Controller
                 'captures.id',
                 'captures.name',
                 'captures.cell_phone',
-                'captures.last_name',
+                'captures.gender',
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
@@ -210,7 +210,7 @@ class AdminController extends Controller
             $capture = Capture::create([
                 'cell_phone' => $request->cell_phone,
                 'name' => $request->name,
-                'last_name' => $request->last_name ?? '',
+                'gender' => $request->gender ?? '',
              //   'invoice_number' => $request->invoice_number,
                 'contact_number' => $request->contact_number ?? $request->cell_phone,
                 'city' => $request->city ?? '',
@@ -279,7 +279,7 @@ public function updateCapture(Request $request, $id)
         // Preparar datos para actualizar
         $updateData = [
             'name' => $request->name ?? '',
-            'last_name' => $request->last_name ?? '',
+            'gender' => $request->gender ?? '',
            // 'invoice_number' => $request->invoice_number ?? '',
             'cell_phone' => $request->cell_phone,
             'contact_number' => $request->contact_number ?? '',

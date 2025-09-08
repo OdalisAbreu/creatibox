@@ -22,7 +22,7 @@ class CapturesExport implements FromCollection, WithHeadings
                 'captures.id',
             //    'captures.invoice_number',
                 'captures.name',
-                'captures.last_name',
+                'captures.gender',
                 'captures.card_id',
                 'captures.cell_phone',
                 'captures.contact_number',
@@ -57,9 +57,8 @@ class CapturesExport implements FromCollection, WithHeadings
     {
         return [
             'ID', 
-            'Número de Factura', 
             'Nombre', 
-            'Apellido', 
+            'Género', 
             'Cédula', 
             'Celular', 
             'Número de Contacto', 

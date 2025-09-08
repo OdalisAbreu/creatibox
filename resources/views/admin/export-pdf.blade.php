@@ -75,7 +75,7 @@
             <tr>
                 <th>No.</th>
                 <th>Nombre</th>
-                <th>Apellido</th>
+                <th>Género</th>
                 <th>Cédula</th>
                 <th>Número de Contacto</th>
                 <th>Ciudad</th>
@@ -89,7 +89,7 @@
             <tr>
                 <td>{{ $capture->id }}</td>
                 <td>{{ $capture->name }}</td>
-                <td>{{ $capture->last_name }}</td>
+                <td>{{ $capture->gender }}</td>
                 <td>{{ $capture->card_id }}</td>
                 <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
                 <td>{{ $capture->city }}</td>

@@ -30,7 +30,7 @@ class CaptureController extends Controller
         Capture::create([
             'cell_phone' => $phone ?? $cell_phone,
             'name' => $request->name,
-            'last_name' => $request->last_name ?? '',
+            'gender' => $request->gender ?? '',
        //     'invoice_number' => $request->invoice_number,
             'contact_number' => $request->contact_number ?? $cell_phone,
             'city' => $request->city ?? '',

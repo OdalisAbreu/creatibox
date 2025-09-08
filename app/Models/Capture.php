@@ -11,7 +11,7 @@ class Capture extends Model
     protected $fillable = [
         'cell_phone',
         'name',
-        'last_name',
+        'gender',
         'city',
         'storage',
       //  'invoice_number',
