@@ -38,6 +38,7 @@ class CaptureController extends Controller
             'card_id' => $card_id,
             'completed' => false,
             'number_send_message' => $cell_phone,
+            'passport' => $request->passport ?? '',
         ]);
     }
 

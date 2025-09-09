@@ -19,6 +19,7 @@ class Capture extends Model
         'card_id',
         'completed',
         'number_send_message',
+        'passport',
     ];
     public function images()
     {

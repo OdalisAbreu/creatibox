@@ -85,6 +85,7 @@
                         <th>Nombre</th>
                         <th>Género</th>
                         <th>Card ID</th>
+                        <th>Pasaporte</th>
                         <th>Num. Contacto</th>
                         <th>Estado</th>
                         <th>Factura</th>
@@ -98,6 +99,7 @@
                         <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
                         <td title="{{ $capture->gender }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->gender, 15) }}</td>
                         <td>{{ $capture->card_id }}</td>
+                        <td>{{ $capture->passport ?? '-' }}</td>
                         <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
                         <td>
                             @if ($capture->completed)
@@ -309,6 +311,13 @@
                             @enderror
                         </div>
                         <div class="mb-3">
+                            <label for="passport" class="form-label">Pasaporte</label>
+                            <input type="text" class="form-control @error('passport') is-invalid @enderror" id="passport" name="passport" value="{{ old('passport') }}">
+                            @error('passport')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <label for="cell_phone" class="form-label">Celular</label>
                             <input type="text" class="form-control @error('cell_phone') is-invalid @enderror" id="cell_phone" name="cell_phone" value="{{ old('cell_phone') }}" required>
                             @error('cell_phone')
@@ -390,6 +399,10 @@
                         <div class="mb-3">
                             <label for="edit_card_id" class="form-label">Cédula</label>
                             <input type="text" class="form-control" id="edit_card_id" name="card_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_passport" class="form-label">Pasaporte</label>
+                            <input type="text" class="form-control" id="edit_passport" name="passport">
                         </div>
                         <div class="mb-3">
                             <label for="cell_phone" class="form-label">Celular</label>
@@ -525,6 +538,10 @@
                                 <div class="mb-3">
                                     <label for="edit_card_id" class="form-label">Cédula</label>
                                     <input type="text" class="form-control" id="edit_card_id" name="card_id" value="${data.card_id}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_passport" class="form-label">Passport</label>
+                                    <input type="text" class="form-control" id="edit_passport" name="passport" value="${data.passport || ''}">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit_cell_phone" class="form-label">Celular</label>

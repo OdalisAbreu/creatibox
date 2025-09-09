@@ -92,6 +92,7 @@ class AdminController extends Controller
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
+                'captures.passport',
                 'captures.completed',
                 'captures.created_at',
                 'capture_images.image_path',
@@ -166,6 +167,7 @@ class AdminController extends Controller
                 'captures.city',
                 'captures.storage',
                 'captures.card_id',
+                'captures.passport',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
@@ -216,7 +218,8 @@ class AdminController extends Controller
                 'city' => $request->city ?? '',
                 'storage' => $request->storage ?? '',
                 'card_id' => $card_id,
-                'completed' => true
+                'completed' => true,
+                'passport' => $request->passport ?? '',
             ]);
 
             // Guardar la imagen en el almacenamiento
@@ -286,6 +289,7 @@ public function updateCapture(Request $request, $id)
             'city' => $request->city ?? '',
             'storage' => $request->storage ?? '',
             'card_id' => $card_id,
+            'passport' => $request->passport ?? '',
         ];
         
         // Log para debug
