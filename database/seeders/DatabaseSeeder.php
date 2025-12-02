@@ -25,9 +25,9 @@ class DatabaseSeeder extends Seeder
 
         //add wasapi account
         WasapiAccount::create([
-            'phone' => '18098510363',
-            'token' => '25903|e6Gg8KcLHVeryRk6qQxAaUWBzDa9xDFkVqoj01Bz',
-            'wasapi_id' => '11640',
+            'phone' => '18099901415',
+            'token' => '65853|X7le98KtKB5nKCj2ZavGgDrwAYjVIrK34uC6oI2f',
+            'wasapi_id' => '13701',
             'final_message' => '¡Listo! Tu factura ha sido recibida correctamente. ✅
 
 *¡Gracias por participar en Estrellas de la Navidad!* 🌟
