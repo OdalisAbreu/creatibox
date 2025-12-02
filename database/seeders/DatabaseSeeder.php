@@ -28,11 +28,14 @@ class DatabaseSeeder extends Seeder
             'phone' => '18098510363',
             'token' => '25903|e6Gg8KcLHVeryRk6qQxAaUWBzDa9xDFkVqoj01Bz',
             'wasapi_id' => '11640',
-            'final_message' => '🧾✨  
- 
-Tu participación en la promoción “Rumbo al Clásico 2026 con Schick” ha sido registrada exitosamente. 
+            'final_message' => '¡Listo! Tu factura ha sido recibida correctamente. ✅
 
-👉 Recuerda: Mientras más productos Schick compres y facturas registres, más oportunidades tendrás de ganar.',
+*¡Gracias por participar en Estrellas de la Navidad!* 🌟
+
+Recuerda: mientras más facturas registres, más oportunidades tienes de ganar ese bar soñado para tu hogar. Promoción válida hasta el 10 de enero del 2026. Evite el exceso de alcohol. 
+
+¡Mucha suerte! 🍀
+',
         ]);
     }
 }

@@ -22,7 +22,6 @@ class CapturesExport implements FromCollection, WithHeadings
                 'captures.id',
             //    'captures.invoice_number',
                 'captures.name',
-                'captures.gender',
                 'captures.card_id',
                 'captures.passport',
                 'captures.cell_phone',
@@ -59,7 +58,6 @@ class CapturesExport implements FromCollection, WithHeadings
         return [
             'ID', 
             'Nombre', 
-            'Género', 
             'Cédula', 
             'Pasaporte', 
             'Celular', 

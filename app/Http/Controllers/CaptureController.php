@@ -30,7 +30,6 @@ class CaptureController extends Controller
         Capture::create([
             'cell_phone' => $phone ?? $cell_phone,
             'name' => $request->name,
-            'gender' => $request->gender ?? '',
        //     'invoice_number' => $request->invoice_number,
             'contact_number' => $request->contact_number ?? $cell_phone,
             'city' => $request->city ?? '',
@@ -44,7 +43,29 @@ class CaptureController extends Controller
 
     public function showForm($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail()->load('images');
+        try {
+            $capture = Capture::where('cell_phone', $cell_phone)->latest()->first();
+            
+            if (!$capture) {
+                Log::warning('Intento de acceso a formulario con número no registrado: ' . $cell_phone);
+                // Mostrar una vista de error en lugar de redirigir
+                return view('capture.error', [
+                    'message' => 'No se encontró el cliente con el número proporcionado.',
+                    'cell_phone' => $cell_phone
+                ]);
+            }
+            
+            $capture->load('images');
+        } catch (\Exception $e) {
+            Log::error('Error al mostrar el formulario: ' . $e->getMessage(), [
+                'cell_phone' => $cell_phone,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return view('capture.error', [
+                'message' => 'Ocurrió un error al cargar el formulario. Por favor, intenta nuevamente.',
+                'cell_phone' => $cell_phone
+            ]);
+        }
         
         // Si ya tiene una imagen, redirigir a la página de completado
         $wasapiAccount = WasapiAccount::first();
@@ -60,7 +81,12 @@ class CaptureController extends Controller
                 'invoice_image' => 'required|image|max:5072' // 3MB máximo
             ]);
 
-            $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail();
+            $capture = Capture::where('cell_phone', $cell_phone)->latest()->first();
+            
+            if (!$capture) {
+                Log::warning('Intento de subir imagen con número no registrado: ' . $cell_phone);
+                return redirect()->back()->with('error', 'No se encontró el cliente. Por favor, verifica el número de teléfono.');
+            }
 
 
             // Guarda en storage/app/public/invoices y retorna el path relativo

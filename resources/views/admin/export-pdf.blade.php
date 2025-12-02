@@ -75,7 +75,6 @@
             <tr>
                 <th>No.</th>
                 <th>Nombre</th>
-                <th>Género</th>
                 <th>Cédula</th>
                 <th>Pasaporte</th>
                 <th>Número de Contacto</th>
@@ -90,7 +89,6 @@
             <tr>
                 <td>{{ $capture->id }}</td>
                 <td>{{ $capture->name }}</td>
-                <td>{{ $capture->gender }}</td>
                 <td>{{ $capture->card_id }}</td>
                 <td>{{ $capture->passport ?? '-' }}</td>
                 <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
