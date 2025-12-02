@@ -83,8 +83,8 @@
                     <tr>
                         <th>No.</th>
                         <th>Nombre</th>
-                        <th>Card ID</th>
-                        <th>Pasaporte</th>
+                        <th>Cédula o Pasaporte</th>
+                        <!-- <th>Pasaporte</th> -->
                         <th>Num. Contacto</th>
                         <th>Estado</th>
                         <th>Factura</th>
@@ -97,7 +97,7 @@
                         <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->id }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->id, 20) }}</a></td>
                         <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
                         <td>{{ $capture->card_id }}</td>
-                        <td>{{ $capture->passport ?? '-' }}</td>
+                       <!-- <td>{{ $capture->passport ?? '-' }}</td> -->
                         <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
                         <td>
                             @if ($capture->completed)
