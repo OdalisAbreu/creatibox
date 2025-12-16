@@ -27,12 +27,16 @@ class AdminController extends Controller
             );
 
         // Aplicar filtros
-        if ($request->filled('name')) {
-            $query->where('captures.name', 'like', '%' . $request->name . '%');
+        if ($request->filled('code')) {
+            $query->where('captures.Code', 'like', '%' . $request->code . '%');
         }
 
-        if ($request->filled('cell_phone')) {
-            $query->where('captures.cell_phone', 'like', '%' . $request->cell_phone . '%');
+        if ($request->filled('description')) {
+            $query->where('captures.Description', 'like', '%' . $request->description . '%');
+        }
+
+        if ($request->filled('department')) {
+            $query->where('captures.department', 'like', '%' . $request->department . '%');
         }
 
         if ($request->filled('start_date')) {
@@ -52,7 +56,7 @@ class AdminController extends Controller
         }
 
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
+        if (!$request->filled('code') && !$request->filled('description') && !$request->filled('department') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -84,14 +88,11 @@ class AdminController extends Controller
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
                 'captures.id',
-             //   'captures.invoice_number',
-                'captures.name',
-                'captures.card_id',
-                'captures.cell_phone',
-                'captures.contact_number',
-                'captures.city',
-                'captures.storage',
-                'captures.passport',
+                'captures.Code',
+                'captures.Description',
+                'captures.department',
+                'captures.sucursal',
+                'captures.collaborator',
                 'captures.completed',
                 'captures.created_at',
                 'capture_images.image_path',
@@ -99,12 +100,16 @@ class AdminController extends Controller
             );
 
         // Aplicar filtros
-        if ($request->filled('name')) {
-            $query->where('captures.name', 'like', '%' . $request->name . '%');
+        if ($request->filled('code')) {
+            $query->where('captures.Code', 'like', '%' . $request->code . '%');
         }
 
-        if ($request->filled('cell_phone')) {
-            $query->where('captures.cell_phone', 'like', '%' . $request->cell_phone . '%');
+        if ($request->filled('description')) {
+            $query->where('captures.Description', 'like', '%' . $request->description . '%');
+        }
+
+        if ($request->filled('department')) {
+            $query->where('captures.department', 'like', '%' . $request->department . '%');
         }
 
         if ($request->filled('start_date')) {
@@ -124,7 +129,7 @@ class AdminController extends Controller
         }
 
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
+        if (!$request->filled('code') && !$request->filled('description') && !$request->filled('department') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -159,13 +164,11 @@ class AdminController extends Controller
         $captures = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
                 'captures.id',
-                'captures.name',
-                'captures.cell_phone',
-                'captures.contact_number',
-                'captures.city',
-                'captures.storage',
-                'captures.card_id',
-                'captures.passport',
+                'captures.Code',
+                'captures.Description',
+                'captures.department',
+                'captures.sucursal',
+                'captures.collaborator',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
@@ -183,14 +186,28 @@ class AdminController extends Controller
     {
         $capture = Capture::findOrFail($request->capture_id);
 
-        // Guardar la imagen en el almacenamiento
+        // Buscar todas las imágenes existentes para este capture
+        $existingImages = CaptureImage::where('capture_id', $capture->id)->get();
+
+        // Eliminar todas las imágenes anteriores del almacenamiento
+        foreach ($existingImages as $existingImage) {
+            if ($existingImage->image_path && Storage::disk('public')->exists($existingImage->image_path)) {
+                Storage::disk('public')->delete($existingImage->image_path);
+            }
+        }
+
+        // Eliminar todos los registros anteriores de la base de datos
+        CaptureImage::where('capture_id', $capture->id)->delete();
+
+        // Guardar la nueva imagen en el almacenamiento
         $path = $request->file('image')->store('invoices', 'public');
 
-        // Crear o actualizar el registro de la imagen
-        CaptureImage::updateOrCreate(
-            ['capture_id' => $capture->id],
-            ['image_path' => $path]
-        );
+        // Crear un nuevo registro con la nueva imagen
+        CaptureImage::create([
+            'capture_id' => $capture->id,
+            'image_path' => $path
+        ]);
+
         // Actualizar el estado de la captura a completado
         $capture->update(['completed' => true]);
 
@@ -200,23 +217,24 @@ class AdminController extends Controller
     public function storeCapture(Request $request)
     {
         try {
-
-
-            // Limpiar el card_id para que solo contenga números
-            $card_id = preg_replace('/\s+/', '', $request->card_id);
-            $card_id = preg_replace('/\D/', '', $card_id);
+            // Validar campos requeridos
+            $request->validate([
+                'Code' => 'required|string',
+                'Description' => 'required|string',
+                'department' => 'required|string',
+                'sucursal' => 'required|string',
+                'collaborator' => 'required|string',
+                'invoice_image' => 'required|image|max:5072'
+            ]);
 
             // Crear el registro de captura
             $capture = Capture::create([
-                'cell_phone' => $request->cell_phone,
-                'name' => $request->name,
-             //   'invoice_number' => $request->invoice_number,
-                'contact_number' => $request->contact_number ?? $request->cell_phone,
-                'city' => $request->city ?? '',
-                'storage' => $request->storage ?? '',
-                'card_id' => $card_id,
+                'Code' => $request->Code,
+                'Description' => $request->Description,
+                'department' => $request->department,
+                'sucursal' => $request->sucursal,
+                'collaborator' => $request->collaborator,
                 'completed' => true,
-                'passport' => $request->passport ?? '',
             ]);
 
             // Guardar la imagen en el almacenamiento
@@ -228,16 +246,20 @@ class AdminController extends Controller
                 'image_path' => $path
             ]);
 
-                    return redirect()->route('dashboard')->with('success', 'Participante creado correctamente.');
-    } catch (\Illuminate\Database\QueryException $e) {
-        if ($e->getCode() == 23000) {
+            return redirect()->route('dashboard')->with('success', 'Registro creado correctamente.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['Code' => 'Este código ya está registrado.']);
+            }
+            throw $e;
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['cell_phone' => 'Este número de celular ya está registrado.']);
+                ->withErrors($e->errors());
         }
-        throw $e;
     }
-}
 
 public function editCapture($id)
 {
@@ -253,39 +275,32 @@ public function updateCapture(Request $request, $id)
         $capture = Capture::findOrFail($id);
         
         // Validar campos requeridos
-        if (!$request->filled('cell_phone')) {
+        if (!$request->filled('Code')) {
             return response()->json([
                 'success' => false,
-                'message' => 'El campo celular es requerido.'
+                'message' => 'El campo código es requerido.'
             ], 422);
         }
         
-        // Validar que el celular no esté duplicado (excluyendo el registro actual)
-        $existingCapture = Capture::where('cell_phone', $request->cell_phone)
+        // Validar que el código no esté duplicado (excluyendo el registro actual)
+        $existingCapture = Capture::where('Code', $request->Code)
             ->where('id', '!=', $id)
             ->first();
             
         if ($existingCapture) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este número de celular ya está registrado.'
+                'message' => 'Este código ya está registrado.'
             ], 422);
         }
 
-        // Limpiar el card_id para que solo contenga números
-        $card_id = $request->filled('card_id') ? preg_replace('/\s+/', '', $request->card_id) : '';
-        $card_id = preg_replace('/\D/', '', $card_id);
-
         // Preparar datos para actualizar
         $updateData = [
-            'name' => $request->name ?? '',
-           // 'invoice_number' => $request->invoice_number ?? '',
-            'cell_phone' => $request->cell_phone,
-            'contact_number' => $request->contact_number ?? '',
-            'city' => $request->city ?? '',
-            'storage' => $request->storage ?? '',
-            'card_id' => $card_id,
-            'passport' => $request->passport ?? '',
+            'Code' => $request->Code,
+            'Description' => $request->Description ?? '',
+            'department' => $request->department ?? '',
+            'sucursal' => $request->sucursal ?? '',
+            'collaborator' => $request->collaborator ?? '',
         ];
         
         // Log para debug

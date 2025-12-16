@@ -1,701 +1,868 @@
 <x-app-layout>
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h2">📄 Panel de Capturas</h1>
-            <div>
-                <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newParticipantModal">
-                    <i class="fas fa-plus"></i> Nuevo Participante
-                </button>
-                @if ($captures->count() > 0)
-                <a href="{{ url('/admin/export/excel') }}?{{ http_build_query(request()->all()) }}" class="btn btn-success me-2">
-                    <i class="fas fa-file-excel"></i> Exportar Excel
-                </a>
-                <a href="{{ url('/admin/export/pdf') }}?{{ http_build_query(request()->all()) }}" class="btn btn-danger" target="_blank">
-                    <i class="fas fa-file-pdf"></i> Exportar PDF
-                </a>
-                @endif
-            </div>
-        </div>
-        <!-- Tarjetas de resumen -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-white bg-warning shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Pendientes</h5>
-                        <p class="card-text fs-4">{{ $pendingCount }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Completados</h5>
-                        <p class="card-text fs-4">{{ $completedCount }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-primary shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Registros</h5>
-                        <p class="card-text fs-4">{{ $totalCount }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="capture-page">
+        <div class="container py-3 py-lg-4">
 
-        <!-- Filtros generales -->
-        <form method="GET" class="d-flex align-items-center mb-4">
-            <div class="me-2">
-                <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Nombre">
-            </div>
-            <div class="me-2">
-                <input type="text" name="cell_phone" value="{{ request('cell_phone') }}" class="form-control" placeholder="Celular">
-            </div>
-            <div class="me-2">
-                <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" placeholder="Fecha inicio">
-            </div>
-            <div class="me-2">
-                <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" placeholder="Fecha fin">
-            </div>
-            <div class="me-3" style="min-width: 150px;">
-                <select name="status" class="form-control">
-                    <option value="">Estados</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completados</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendientes</option>
-                </select>
-            </div>
-            <div class="me-2">
-                <button type="submit" class="btn btn-primary me-2">🔍 Filtrar</button>
-            </div>
-            <div class="me-2">
-                <a href="{{ url('/admin') }}" class="btn btn-secondary">🧹 Limpiar</a>
-            </div>
-            <div>
-                <button type="button" class="btn btn-info" onclick="location.reload();">🔄 Actualizar</button>
-            </div>
-        </form>
+            <!-- Header -->
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="brand-dot" aria-hidden="true"></span>
+                    <h1 class="h4 mb-0 brand-title">Panel de Capturas</h1>
+                </div>
 
-        <!-- Tabla de capturas -->
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>No.</th>
-                        <th>Nombre</th>
-                        <th>Cédula o Pasaporte</th>
-                        <!-- <th>Pasaporte</th> -->
-                        <th>Num. Contacto</th>
-                        <th>Estado</th>
-                        <th>Factura</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($captures as $capture)
-                    <tr>
-                        <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->id }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->id, 20) }}</a></td>
-                        <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
-                        <td>{{ $capture->card_id }}</td>
-                       <!-- <td>{{ $capture->passport ?? '-' }}</td> -->
-                        <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
-                        <td>
-                            @if ($capture->completed)
-                            <span class="badge bg-success">Completado</span>
-                            @else
-                            <span class="badge bg-warning text-dark">Pendiente</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if ($capture->image_path)
-                            <img src="{{ Storage::url($capture->image_path) }}"
-                                alt="Factura"
-                                class="img-thumbnail"
-                                style="max-width: 70px; cursor: pointer;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalFactura"
-                                data-image="{{ Storage::url($capture->image_path) }}">
-                            @else
-                            <span class="text-muted">Sin imagen</span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center justify-content-center gap-2">
-                                <!-- Botón de editar -->
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                    <button type="button"
+                            class="btn btn-brand"
+                            id="newRecordBtn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#newCaptureModal">
+                        <i class="fas fa-plus me-1"></i> Nuevo Registro
+                    </button>
+
+                    @if ($captures->count() > 0)
+                        <a href="{{ url('/admin/export/excel') }}?{{ http_build_query(request()->all()) }}"
+                           class="btn btn-brand-slate">
+                            <i class="fas fa-file-excel me-1"></i> Exportar Excel
+                        </a>
+
+                        <a href="{{ url('/admin/export/pdf') }}?{{ http_build_query(request()->all()) }}"
+                           class="btn btn-brand-red-dark"
+                           target="_blank">
+                            <i class="fas fa-file-pdf me-1"></i> Exportar PDF
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            <!-- KPI + Filtros -->
+            <div class="row g-3 align-items-stretch mb-3">
+
+                <!-- KPI -->
+                <div class="col-12 col-lg-3">
+                    <div class="card brand-kpi shadow-sm h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <div class="small opacity-75">Total Registros</div>
+                            <div class="fs-3 fw-semibold">{{ $totalCount }}</div>
+                            <div class="mt-2 small opacity-75">Última actualización: {{ now()->format('d/m/Y H:i') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="col-12 col-lg-9">
+                    <div class="card brand-card shadow-sm h-100">
+                        <div class="card-body">
+                            <form method="GET">
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-5">
+                                        <label class="form-label small mb-1 text-muted">Código</label>
+                                        <input type="text"
+                                               name="code"
+                                               value="{{ request('code') }}"
+                                               class="form-control brand-input"
+                                               placeholder="Ej: ABC-123">
+                                    </div>
+
+                                    <div class="col-12 col-md-7">
+                                        <label class="form-label small mb-1 text-muted">Departamento</label>
+                                        <select name="department" class="form-select brand-input">
+                                            <option value="">Todos los departamentos</option>
+                                            <option value="CONTABILIDAD Y FINANZAS" {{ request('department') == 'CONTABILIDAD Y FINANZAS' ? 'selected' : '' }}>CONTABILIDAD Y FINANZAS</option>
+                                            <option value="COBROS Y COMISIONES" {{ request('department') == 'COBROS Y COMISIONES' ? 'selected' : '' }}>COBROS Y COMISIONES</option>
+                                            <option value="GESTION DE CUENTAS" {{ request('department') == 'GESTION DE CUENTAS' ? 'selected' : '' }}>GESTION DE CUENTAS</option>
+                                            <option value="CONSEJO" {{ request('department') == 'CONSEJO' ? 'selected' : '' }}>CONSEJO</option>
+                                            <option value="CUMPLIMIENTO Y CALIDAD" {{ request('department') == 'CUMPLIMIENTO Y CALIDAD' ? 'selected' : '' }}>CUMPLIMIENTO Y CALIDAD</option>
+                                            <option value="GESTION DEL TALENTO HUMANO" {{ request('department') == 'GESTION DEL TALENTO HUMANO' ? 'selected' : '' }}>GESTION DEL TALENTO HUMANO</option>
+                                            <option value="MERCADEO Y COMUNICACIONES" {{ request('department') == 'MERCADEO Y COMUNICACIONES' ? 'selected' : '' }}>MERCADEO Y COMUNICACIONES</option>
+                                            <option value="OPERACIONES" {{ request('department') == 'OPERACIONES' ? 'selected' : '' }}>OPERACIONES</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex flex-column flex-sm-row gap-2 mt-3">
+                                    <button type="submit" class="btn btn-brand">
+                                        <i class="fas fa-filter me-1"></i> Filtrar
+                                    </button>
+                                    <a href="{{ url('/admin') }}" class="btn btn-brand-outline">
+                                        <i class="fas fa-broom me-1"></i> Limpiar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Vista móvil: Cards -->
+            <div class="d-md-none">
+                @foreach ($captures as $capture)
+                    <div class="card brand-card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">
+                                        <a href="/capture/{{ $capture->Code }}" class="brand-link text-decoration-none">
+                                            #{{ $capture->id }} - {{ Str::limit($capture->Code, 20) }}
+                                        </a>
+                                    </h6>
+                                    <p class="text-muted small mb-1"><strong>Descripción:</strong> {{ Str::limit($capture->Description, 40) }}</p>
+                                    <p class="text-muted small mb-1"><strong>Depto:</strong> {{ Str::limit($capture->department, 25) }}</p>
+                                    <p class="text-muted small mb-1"><strong>Sucursal:</strong> {{ $capture->sucursal }}</p>
+                                    <p class="text-muted small mb-0"><strong>Colaborador:</strong> {{ Str::limit($capture->collaborator, 30) }}</p>
+                                </div>
+
+                                @if($capture->image_path)
+                                    <img src="{{ asset('storage/' . $capture->image_path) }}"
+                                         alt="Imagen"
+                                         class="rounded object-fit-cover flex-shrink-0"
+                                         style="width:80px;height:80px;">
+                                @endif
+                            </div>
+
+                            <div class="d-flex gap-2 flex-wrap">
                                 <button type="button"
-                                    class="btn btn-warning d-flex justify-content-center align-items-center edit-btn"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editModal"
-                                    data-id="{{ $capture->id }}"
-                                    style="width: 50px; height: 50px;"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Editar registro">
-                                    <i class="fas fa-edit" style="font-size: 1.5rem; color: white;"></i>
+                                        class="btn btn-brand-slate btn-sm edit-btn flex-fill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
+                                        data-id="{{ $capture->id }}">
+                                    <i class="fas fa-edit me-1"></i> Editar
                                 </button>
 
-                                <!-- Botón de eliminar -->
                                 @if ($capture->image_id)
-                                <button type="button"
-                                    class="btn btn-danger d-flex justify-content-center align-items-center delete-btn"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
-                                    data-name="{{ $capture->name }}"
-                                    data-url="{{ route('admin.deleteCapture', $capture->image_id) }}"
-                                    style="width: 50px; height: 50px;"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Solo eliminará la factura">
-                                    <i class="fas fa-trash-alt" style="font-size: 1.5rem;"></i>
-                                </button>
+                                    <button type="button"
+                                            class="btn btn-brand-red-dark btn-sm delete-btn flex-fill"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
+                                            data-name="{{ $capture->Description }}"
+                                            data-url="{{ route('admin.deleteCapture', $capture->image_id) }}">
+                                        <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                    </button>
                                 @endif
 
-                                <!-- Botón de subir imagen -->
                                 <button type="button"
-                                    class="btn btn-primary d-flex justify-content-center align-items-center upload-image-btn"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#uploadImageModal"
-                                    data-id="{{ $capture->id }}"
-                                    style="width: 50px; height: 50px;"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Subir imagen">
-                                    <i class="fas fa-camera" style="font-size: 1.5rem;"></i>
+                                        class="btn btn-brand btn-sm upload-image-btn flex-fill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#uploadImageModal"
+                                        data-id="{{ $capture->id }}">
+                                    <i class="fas fa-camera me-1"></i> Imagen
                                 </button>
-
                             </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Vista desktop: Tabla -->
+            <div class="d-none d-md-block">
+                <div class="card brand-card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 brand-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70px;">No.</th>
+                                        <th style="width: 160px;">Código</th>
+                                        <th>Descripción</th>
+                                        <th style="width: 240px;">Departamento</th>
+                                        <th style="width: 130px;">Sucursal</th>
+                                        <th style="width: 240px;">Colaborador</th>
+                                        <th style="width: 120px;">Imagen</th>
+                                        <th style="width: 140px;" class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($captures as $capture)
+                                        <tr>
+                                            <td>
+                                                <a class="brand-link text-decoration-none"
+                                                   href="/capture/{{ $capture->Code }}"
+                                                   title="{{ $capture->id }}">
+                                                    {{ $capture->id }}
+                                                </a>
+                                            </td>
+
+                                            <td class="text-truncate" style="max-width:160px;" title="{{ $capture->Code }}">
+                                                {{ $capture->Code }}
+                                            </td>
+
+                                            <td class="text-truncate" style="max-width:360px;">
+                                                {{ $capture->Description }}
+                                            </td>
+
+                                            <td class="text-truncate" style="max-width:240px;">
+                                                {{ $capture->department }}
+                                            </td>
+
+                                            <td>{{ $capture->sucursal }}</td>
+
+                                            <td class="text-truncate" style="max-width:240px;">
+                                                {{ $capture->collaborator }}
+                                            </td>
+
+                                            <td>
+                                                @if($capture->image_path)
+                                                    <img src="{{ asset('storage/' . $capture->image_path) }}"
+                                                         alt="Imagen"
+                                                         class="rounded object-fit-cover"
+                                                         style="width:72px;height:72px;">
+                                                @else
+                                                    <span class="text-muted small">Sin imagen</span>
+                                                @endif
+                                            </td>
+
+                                            <td class="text-center">
+                                                <div class="d-inline-flex gap-2">
+                                                    <button type="button"
+                                                            class="btn btn-brand-slate btn-sm edit-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editModal"
+                                                            data-id="{{ $capture->id }}"
+                                                            title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
+                                                    @if ($capture->image_id)
+                                                        <button type="button"
+                                                                class="btn btn-brand-red-dark btn-sm delete-btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#deleteModal"
+                                                                data-name="{{ $capture->Description }}"
+                                                                data-url="{{ route('admin.deleteCapture', $capture->image_id) }}"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    @endif
+
+                                                    <button type="button"
+                                                            class="btn btn-brand btn-sm upload-image-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#uploadImageModal"
+                                                            data-id="{{ $capture->id }}"
+                                                            title="Subir imagen">
+                                                        <i class="fas fa-camera"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <div class="mt-3">
+                <div class="d-flex justify-content-center">
+                    {{ $captures->appends(request()->query())->links() }}
+                </div>
+            </div>
+
         </div>
 
-        <!-- Paginación -->
-        <div class="mt-4">
-            {{ $captures->appends(request()->query())->links() }}
-        </div>
-    </div>
-
-
-    <!-- Modal de imagen con botón de descarga -->
-    <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-md">
-            <div class="modal-content bg-white rounded shadow p-3 position-relative">
-
-                <!-- Botón cerrar -->
-                <!-- <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Cerrar"></button> -->
-
-                <!-- Imagen -->
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Factura Grande" class="img-fluid rounded mb-3 mx-auto d-block" style="max-height: 75vh;">
-
-                    <br>
-                    <a id="downloadBtn" href="#" class="btn btn-outline-primary" download target="_blank">
-                        <i class="fas fa-download me-1"></i> Descargar Factura
-                    </a>
+        <!-- Modal de imagen con botón de descarga -->
+        <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-md">
+                <div class="modal-content brand-modal rounded shadow p-3 position-relative">
+                    <div class="modal-body text-center">
+                        <img id="modalImage" src="" alt="Factura Grande" class="img-fluid rounded mb-3 mx-auto d-block" style="max-height: 75vh;">
+                        <a id="downloadBtn" href="#" class="btn btn-brand-outline" download target="_blank">
+                            <i class="fas fa-download me-1"></i> Descargar Factura
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!--------------------------------------------------------------------------------------->
 
-    <!-- Modal de confirmación de eliminación -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <!-- Modal de confirmación de eliminación -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content brand-modal">
+                    <div class="modal-header brand-modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas eliminar la factura de <strong id="deleteName"></strong>?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-brand-outline" data-bs-dismiss="modal">Cancelar</button>
+                        <form id="deleteForm" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-brand-red-dark">Eliminar</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar la factura de <strong id="deleteName"></strong>?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form id="deleteForm" method="POST">
+            </div>
+        </div>
+
+        <!-- Modal para subir imagen -->
+        <div class="modal fade" id="uploadImageModal" tabindex="-1" aria-labelledby="uploadImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content brand-modal">
+                    <form id="uploadImageForm" method="POST" action="{{ route('admin.uploadImage') }}" enctype="multipart/form-data">
                         @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                        <div class="modal-header brand-modal-header">
+                            <h5 class="modal-title" id="uploadImageModalLabel">Subir Imagen</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="capture_id" id="captureId">
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Seleccionar Imagen</label>
+                                <input type="file" class="form-control brand-input" id="image" name="image" accept="image/*" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-brand-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-brand">Subir</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!--------------------------------------------------------------------------------------->
-
-
-    <!-- Modal para subir imagen -->
-    <div class="modal fade" id="uploadImageModal" tabindex="-1" aria-labelledby="uploadImageModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="uploadImageForm" method="POST" action="{{ route('admin.uploadImage') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="uploadImageModalLabel">Subir Imagen</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="capture_id" id="captureId">
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Seleccionar Imagen</label>
-                            <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+        <!-- Modal para nuevo Registro -->
+        <div class="modal fade" id="newCaptureModal" tabindex="-1" aria-labelledby="newCaptureModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content brand-modal">
+                    <form id="newCaptureForm" method="POST" action="{{ route('admin.storeCapture') }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-header brand-modal-header">
+                            <h5 class="modal-title" id="newCaptureModalLabel">Nuevo Registro</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Subir</button>
-                    </div>
-                </form>
+                        <div class="modal-body">
+                            @if ($errors->any())
+                                <div class="alert brand-alert">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <div class="mb-3">
+                                <label for="Code" class="form-label">Código</label>
+                                <input type="text" class="form-control brand-input @error('Code') is-invalid @enderror" id="Code" name="Code" value="{{ old('Code') }}" required>
+                                @error('Code') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Description" class="form-label">Descripción</label>
+                                <input type="text" class="form-control brand-input @error('Description') is-invalid @enderror" id="Description" name="Description" value="{{ old('Description') }}" required>
+                                @error('Description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="department" class="form-label">Departamento</label>
+                                <select class="form-select brand-input @error('department') is-invalid @enderror" id="department" name="department" required>
+                                    <option value="">Seleccione un departamento</option>
+                                    <option value="CONTABILIDAD Y FINANZAS" {{ old('department') == 'CONTABILIDAD Y FINANZAS' ? 'selected' : '' }}>CONTABILIDAD Y FINANZAS</option>
+                                    <option value="COBROS Y COMISIONES" {{ old('department') == 'COBROS Y COMISIONES' ? 'selected' : '' }}>COBROS Y COMISIONES</option>
+                                    <option value="GESTION DE CUENTAS" {{ old('department') == 'GESTION DE CUENTAS' ? 'selected' : '' }}>GESTION DE CUENTAS</option>
+                                    <option value="CONSEJO" {{ old('department') == 'CONSEJO' ? 'selected' : '' }}>CONSEJO</option>
+                                    <option value="CUMPLIMIENTO Y CALIDAD" {{ old('department') == 'CUMPLIMIENTO Y CALIDAD' ? 'selected' : '' }}>CUMPLIMIENTO Y CALIDAD</option>
+                                    <option value="GESTION DEL TALENTO HUMANO" {{ old('department') == 'GESTION DEL TALENTO HUMANO' ? 'selected' : '' }}>GESTION DEL TALENTO HUMANO</option>
+                                    <option value="MERCADEO Y COMUNICACIONES" {{ old('department') == 'MERCADEO Y COMUNICACIONES' ? 'selected' : '' }}>MERCADEO Y COMUNICACIONES</option>
+                                    <option value="OPERACIONES" {{ old('department') == 'OPERACIONES' ? 'selected' : '' }}>OPERACIONES</option>
+                                </select>
+                                @error('department') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="sucursal" class="form-label">Sucursal</label>
+                                <select class="form-select brand-input @error('sucursal') is-invalid @enderror" id="sucursal" name="sucursal" required>
+                                    <option value="">Seleccione una sucursal</option>
+                                    <option value="PRINCIPAL" {{ old('sucursal') == 'PRINCIPAL' ? 'selected' : '' }}>PRINCIPAL</option>
+                                    <option value="ROMANA" {{ old('sucursal') == 'ROMANA' ? 'selected' : '' }}>ROMANA</option>
+                                    <option value="PUNTA CANA" {{ old('sucursal') == 'PUNTA CANA' ? 'selected' : '' }}>PUNTA CANA</option>
+                                </select>
+                                @error('sucursal') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="collaborator" class="form-label">Colaborador Asignado</label>
+                                <input type="text"
+                                       class="form-control brand-input @error('collaborator') is-invalid @enderror"
+                                       id="collaborator"
+                                       name="collaborator"
+                                       list="collaborators-list"
+                                       autocomplete="off"
+                                       value="{{ old('collaborator') }}"
+                                       required>
+                                <datalist id="collaborators-list">
+                                    <option value="ANTONIO CACERES TRONCOSO">
+                                    <option value="ALBERTO PERALTA MARTINEZ">
+                                    <option value="ANTONIO CACERES RICART">
+                                    <option value="CARLOS FLORES ROJAS">
+                                    <option value="ANTONIA CACERES RICART">
+                                    <option value="ISABEL CACERES RICART">
+                                    <option value="ERNESTINA MAGNOLIA LORA ORTIZ">
+                                    <option value="NIKAURYS ALENNY PENA PENA">
+                                    <option value="ROSA NELLY ABAD MUESES">
+                                    <option value="LUIS MANUEL SOUSA TEJADA">
+                                    <option value="JOSE ALBERTO LUNA SILVERIO">
+                                    <option value="GEORGA CAROLINA ROSARIO GUILLEN">
+                                    <option value="IVAN JOSE PIMENTEL CASTILLO">
+                                    <option value="LEYDI RAMIREZ URENA">
+                                    <option value="ARIELA PERDOMO RAMIREZ">
+                                    <option value="ANA MICHELY DE LOS SANTOS MELENDEZ">
+                                    <option value="IVELICE MUNOZ PENA">
+                                    <option value="LILIANA DIAZ RUBIO">
+                                    <option value="YASMIN HENRIQUEZ TAVERAS">
+                                    <option value="FRANCISCO JOSE DE LEON DAVILA">
+                                    <option value="ANA ROSA VELASQUEZ LOPEZ">
+                                    <option value="JAZMIN MEIS CALDERON">
+                                    <option value="MIRIAM ELLIS">
+                                    <option value="ARIS LEIDIS FELIX FULGENCIO">
+                                    <option value="CATHERINE GABRIELA NOLASCO GOMEZ">
+                                    <option value="YULEISI MARIA VENTURA">
+                                    <option value="MARIA VELASQUEZ ACEVEDO">
+                                    <option value="VICTOR MANUEL BODRE PEREZ">
+                                    <option value="MARIELLY RACHELLE VILLAR DE DIOS">
+                                    <option value="JULIO ELIAS VIVENES FIGUEROA">
+                                    <option value="BETSY PRISCILLA IZQUIERDO MONTES DE OCA">
+                                    <option value="JHON CARLOS PIMENTEL SANCHEZ">
+                                    <option value="KIMBERLY SIERRA MEJIA">
+                                    <option value="VARINIA ALEJANDRA LARA TRINIDAD">
+                                    <option value="PALOMA CRISTINA MILIAN DE GONZALEZ">
+                                    <option value="ANDERSON PERALTA PIMENTEL">
+                                    <option value="YANELA STEFFANY ALVARADO LINARES">
+                                    <option value="FAUSTINA HERNANDEZ">
+                                    <option value="ESTEPHANIE ALTAGRACIA NUNEZ LARA">
+                                    <option value="SAYRA GISSELLE RAMON LOPEZ">
+                                    <option value="CRISTINA AMELIA CACERES JACOBO">
+                                    <option value="YAFREYSI AQUINO MONTERO">
+                                    <option value="CLAUDIA DAYANARA BERAS ORTIZ">
+                                    <option value="MAYELIN ZARZUELA FLORIAN">
+                                    <option value="WALKIRIS NAYDELIS RODRIGUEZ SANCHEZ">
+                                    <option value="ANGEL LUIS BAEZ ORTIZ">
+                                    <option value="CRICEILIN YARLINA UREÑA MEJIA">
+                                    <option value="JOSE OCTAVIO MATEO CABRAL">
+                                    <option value="JOAN MANUEL BENZAN HERRERA">
+                                    <option value="BELGICA CORPORAN LORA">
+                                    <option value="MERCEDES PANIAGUA DE LOS SANTOS">
+                                    <option value="MISMARIN SCALHIN FAMILIA FRANCO">
+                                    <option value="MADELIN MICHELLE NEPOMUCENO HERRERA">
+                                    <option value="JANA LORAINE ALMONTE GUZMAN">
+                                    <option value="AMBIORIX DE JESUS DE LA CRUZ REYES">
+                                    <option value="DENIS RIVERA HERNADEZ">
+                                    <option value="MARLENNE RUIZ BISONO">
+                                    <option value="WILMY ANTONIO DE LA ROSA SILVA">
+                                    <option value="HEIDI SUSANA AGRAMONTE JIMENEZ">
+                                    <option value="JOSE RAMON CARABALLO CAMILO">
+                                    <option value="ODALIS DARIEL ABREU MEJIA">
+                                    <option value="ROSANNA FLORENTINO">
+                                    <option value="ANALIA AIMEE ALVAREZ DINA">
+                                    <option value="MELISSA HIDALGO ARIAS">
+                                    <option value="PAOLA YAZMIN MORDAN LARA">
+                                    <option value="ESTHER GARCIA ESPINAL">
+                                    <option value="PEDRO ANTONIO RAMIREZ SUAREZ">
+                                    <option value="EMILY LAURA RAMOS GONZALEZ">
+                                    <option value="JENNIFER NATHALI GENAO REYES">
+                                    <option value="EDDY DE JESUS SANTOS SANTANA">
+                                    <option value="KATHERINE LISSELOTTE REYES TAVAREZ">
+                                    <option value="YISEL YUSBELKIS FONTANILLAS PEREZ">
+                                    <option value="JOAN GARCIA">
+                                </datalist>
+                                @error('collaborator') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="invoice_image" class="form-label">Imagen</label>
+                                <input type="file" class="form-control brand-input @error('invoice_image') is-invalid @enderror" id="invoice_image" name="invoice_image" accept="image/*" required>
+                                @error('invoice_image') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-brand-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-brand">Guardar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!--------------------------------------------------------------------------------------->
+        <!-- Modal para editar registro -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content brand-modal">
+                    <form id="editForm" method="POST">
+                        @csrf
+                        @method('PUT')
 
-    <!-- Modal para nuevo participante -->
-    <div class="modal fade" id="newParticipantModal" tabindex="-1" aria-labelledby="newParticipantModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="newParticipantForm" method="POST" action="{{ route('admin.storeCapture') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="newParticipantModalLabel">Nuevo Participante</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                        <div class="modal-header brand-modal-header">
+                            <h5 class="modal-title" id="editModalLabel">Editar Registro</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        @endif
-<!--                        <div class="mb-3">
-                            <label for="invoice_number" class="form-label">Número de Factura</label>
-                            <input type="text" class="form-control @error('invoice_number') is-invalid @enderror" id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}" required>
-                            @error('invoice_number')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>-->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nombre</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+
+                        <div class="modal-body">
+                            <div id="editErrors" class="alert brand-alert d-none">
+                                <ul class="mb-0" id="editErrorsList"></ul>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_Code" class="form-label">Código</label>
+                                <input type="text" class="form-control brand-input" id="edit_Code" name="Code" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_Description" class="form-label">Descripción</label>
+                                <input type="text" class="form-control brand-input" id="edit_Description" name="Description" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_department" class="form-label">Departamento</label>
+                                <select class="form-select brand-input" id="edit_department" name="department" required>
+                                    <option value="">Seleccione un departamento</option>
+                                    <option value="CONTABILIDAD Y FINANZAS">CONTABILIDAD Y FINANZAS</option>
+                                    <option value="COBROS Y COMISIONES">COBROS Y COMISIONES</option>
+                                    <option value="GESTION DE CUENTAS">GESTION DE CUENTAS</option>
+                                    <option value="CONSEJO">CONSEJO</option>
+                                    <option value="CUMPLIMIENTO Y CALIDAD">CUMPLIMIENTO Y CALIDAD</option>
+                                    <option value="GESTION DEL TALENTO HUMANO">GESTION DEL TALENTO HUMANO</option>
+                                    <option value="MERCADEO Y COMUNICACIONES">MERCADEO Y COMUNICACIONES</option>
+                                    <option value="OPERACIONES">OPERACIONES</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_sucursal" class="form-label">Sucursal</label>
+                                <select class="form-select brand-input" id="edit_sucursal" name="sucursal" required>
+                                    <option value="">Seleccione una sucursal</option>
+                                    <option value="PRINCIPAL">PRINCIPAL</option>
+                                    <option value="ROMANA">ROMANA</option>
+                                    <option value="PUNTA CANA">PUNTA CANA</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="edit_collaborator" class="form-label">Colaborador Asignado</label>
+                                <input type="text"
+                                       class="form-control brand-input"
+                                       id="edit_collaborator"
+                                       name="collaborator"
+                                       list="collaborators-list"
+                                       autocomplete="off"
+                                       required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="card_id" class="form-label">Cédula</label>
-                            <input type="text" class="form-control @error('card_id') is-invalid @enderror" id="card_id" name="card_id" value="{{ old('card_id') }}" required>
-                            @error('card_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-brand-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-brand" id="editSubmitBtn">Actualizar</button>
                         </div>
-                        <div class="mb-3">
-                            <label for="passport" class="form-label">Pasaporte</label>
-                            <input type="text" class="form-control @error('passport') is-invalid @enderror" id="passport" name="passport" value="{{ old('passport') }}">
-                            @error('passport')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="cell_phone" class="form-label">Celular</label>
-                            <input type="text" class="form-control @error('cell_phone') is-invalid @enderror" id="cell_phone" name="cell_phone" value="{{ old('cell_phone') }}" required>
-                            @error('cell_phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="contact_number" class="form-label">Número de Contacto</label>
-                            <input type="text" class="form-control @error('contact_number') is-invalid @enderror" id="contact_number" name="contact_number" value="{{ old('contact_number') }}">
-                            @error('contact_number')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="city" class="form-label">Ciudad</label>
-                            <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city') }}" required>
-                            @error('city')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="storage" class="form-label">Tienda</label>
-                            <input type="text" class="form-control @error('storage') is-invalid @enderror" id="storage" name="storage" value="{{ old('storage') }}" required>
-                            @error('storage')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="invoice_image" class="form-label">Factura</label>
-                            <input type="file" class="form-control @error('invoice_image') is-invalid @enderror" id="invoice_image" name="invoice_image" accept="image/*" required>
-                            @error('invoice_image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!--------------------------------------------------------------------------------------->
+        <!-- Estilos: rebranding con paleta -->
+        <style>
+            .capture-page{
+                --brand-red: #E31937;
+                --brand-red-dark: #C41230;
+                --brand-slate: #425968;
+                --brand-gray: #949CA1;
 
-    <!-- Modal para editar participante -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Editar Participante</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="editErrors" class="alert alert-danger" style="display: none;">
-                            <ul class="mb-0" id="editErrorsList"></ul>
-                        </div>
-<!--                        <div class="mb-3">
-                            <label for="edit_invoice_number" class="form-label">Número de Factura</label>
-                            <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" required>
-                        </div>-->
-                        <div class="mb-3">
-                            <label for="edit_name" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="edit_name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_card_id" class="form-label">Cédula</label>
-                            <input type="text" class="form-control" id="edit_card_id" name="card_id" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_passport" class="form-label">Pasaporte</label>
-                            <input type="text" class="form-control" id="edit_passport" name="passport">
-                        </div>
-                        <div class="mb-3">
-                            <label for="cell_phone" class="form-label">Celular</label>
-                            <input type="text" class="form-control" id="cell_phone" name="cell_phone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_contact_number" class="form-label">Número de Contacto</label>
-                            <input type="text" class="form-control" id="edit_contact_number" name="contact_number">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_city" class="form-label">Ciudad</label>
-                            <input type="text" class="form-control" id="edit_city" name="city" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_storage" class="form-label">Tienda</label>
-                            <input type="text" class="form-control" id="edit_storage" name="storage" required>
-                        </div>
-                    </div>
+                --brand-bg: #F7F8FA;
+                --brand-text: #16202A;
+                --brand-border: rgba(66, 89, 104, .18);
 
-                </form>
-            </div>
-        </div>
-    </div>
+                background: var(--brand-bg);
+                min-height: 100%;
+            }
 
-    <!--------------------------------------------------------------------------------------->
-    <!---Cambia la clase container para que tenga menos padding--->
-    <style>
-        .container {
-            padding: 0 0 !important;
-            max-width: 1024px !important;
-        }
-    </style>
+            .capture-page .brand-title{
+                color: var(--brand-text);
+                letter-spacing: .2px;
+            }
 
-    <!-- JS: cargar imagen + cerrar al hacer clic fuera -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('modalFactura');
-            const modalImage = document.getElementById('modalImage');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const thumbnails = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#modalFactura"]');
-            const uploadButtons = document.querySelectorAll('.upload-image-btn');
-            const captureIdInput = document.getElementById('captureId');
+            .capture-page .brand-dot{
+                width: 10px;
+                height: 10px;
+                border-radius: 999px;
+                background: var(--brand-red);
+                box-shadow: 0 0 0 6px rgba(227, 25, 55, .12);
+            }
 
-            const deleteModal = document.getElementById('deleteModal');
-            const deleteName = document.getElementById('deleteName');
-            const deleteForm = document.getElementById('deleteForm');
+            .capture-page .brand-card{
+                border: 1px solid var(--brand-border);
+                border-radius: 14px;
+            }
 
-            thumbnails.forEach(img => {
-                img.addEventListener('click', () => {
-                    const imageUrl = img.getAttribute('data-image');
-                    modalImage.src = imageUrl;
-                    downloadBtn.href = imageUrl;
-                });
-            });
+            .capture-page .brand-kpi{
+                color: #fff;
+                border: 0;
+                border-radius: 14px;
+                background: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-red-dark) 100%);
+            }
 
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    const bsModal = bootstrap.Modal.getInstance(modal);
-                    bsModal.hide();
-                }
-            });
+            .capture-page .brand-input{
+                border-radius: 12px;
+                border: 1px solid var(--brand-border);
+            }
+            .capture-page .brand-input:focus{
+                border-color: rgba(227, 25, 55, .55);
+                box-shadow: 0 0 0 .2rem rgba(227, 25, 55, .15);
+            }
 
-            // Escucha los clics en los botones de eliminar
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const name = this.getAttribute('data-name');
-                    const url = this.getAttribute('data-url');
+            .capture-page .btn{
+                border-radius: 12px;
+                font-weight: 600;
+                letter-spacing: .2px;
+            }
 
-                    // Actualiza el contenido del modal
-                    deleteName.textContent = name;
-                    deleteForm.setAttribute('action', url);
-                });
+            .capture-page .btn-brand{
+                background: var(--brand-red);
+                border: 1px solid var(--brand-red);
+                color: #fff;
+            }
+            .capture-page .btn-brand:hover{
+                background: var(--brand-red-dark);
+                border-color: var(--brand-red-dark);
+                color: #fff;
+            }
+
+            .capture-page .btn-brand-red-dark{
+                background: var(--brand-red-dark);
+                border: 1px solid var(--brand-red-dark);
+                color: #fff;
+            }
+            .capture-page .btn-brand-red-dark:hover{
+                filter: brightness(0.95);
+                color: #fff;
+            }
+
+            .capture-page .btn-brand-slate{
+                background: var(--brand-slate);
+                border: 1px solid var(--brand-slate);
+                color: #fff;
+            }
+            .capture-page .btn-brand-slate:hover{
+                filter: brightness(0.95);
+                color: #fff;
+            }
+
+            .capture-page .btn-brand-outline{
+                background: #fff;
+                border: 1px solid var(--brand-border);
+                color: var(--brand-slate);
+            }
+            .capture-page .btn-brand-outline:hover{
+                border-color: rgba(66, 89, 104, .35);
+                background: rgba(148, 156, 161, .10);
+                color: var(--brand-slate);
+            }
+
+            .capture-page .brand-link{
+                color: var(--brand-red-dark);
+                font-weight: 700;
+            }
+            .capture-page .brand-link:hover{
+                color: var(--brand-red);
+            }
+
+            .capture-page .brand-table thead{
+                background: var(--brand-slate);
+                color: #fff;
+            }
+            .capture-page .brand-table thead th{
+                font-weight: 700;
+                border-bottom: 0;
+                white-space: nowrap;
+            }
+            .capture-page .brand-table tbody tr{
+                background: #fff;
+            }
+            .capture-page .brand-table tbody tr:hover{
+                background: rgba(148, 156, 161, .10);
+            }
+            .capture-page .brand-table td{
+                border-color: rgba(66, 89, 104, .12);
+            }
+
+            .capture-page .brand-modal{
+                border-radius: 14px;
+                border: 1px solid var(--brand-border);
+            }
+            .capture-page .brand-modal-header{
+                background: rgba(66, 89, 104, .06);
+                border-bottom: 1px solid var(--brand-border);
+            }
+
+            .capture-page .brand-alert{
+                border: 1px solid rgba(227, 25, 55, .25);
+                background: rgba(227, 25, 55, .08);
+                color: var(--brand-red-dark);
+                border-radius: 12px;
+            }
+
+            .capture-page .object-fit-cover { object-fit: cover; }
+
+            .capture-page .pagination { flex-wrap: wrap; justify-content: center; gap: .25rem; }
+            .capture-page .page-link{
+                border-radius: 10px;
+                border: 1px solid var(--brand-border);
+                color: var(--brand-slate);
+            }
+            .capture-page .page-item.active .page-link{
+                background: var(--brand-red);
+                border-color: var(--brand-red);
+                color: #fff;
+            }
+        </style>
+
+        <!-- JS (sin cambios funcionales) -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                // Tooltip (una sola vez)
                 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-            });
+                tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
 
+                // Modal imagen
+                const modal = document.getElementById('modalFactura');
+                const modalImage = document.getElementById('modalImage');
+                const downloadBtn = document.getElementById('downloadBtn');
+                const thumbnails = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#modalFactura"]');
 
-            uploadButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const captureId = this.getAttribute('data-id');
-                    captureIdInput.value = captureId;
-                });
-            });
-
-            // Funcionalidad para editar
-            const editButtons = document.querySelectorAll('.edit-btn');
-            const editForm = document.getElementById('editForm');
-            const editErrors = document.getElementById('editErrors');
-            const editErrorsList = document.getElementById('editErrorsList');
-
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const captureId = this.getAttribute('data-id');
-                    
-                    // Mostrar indicador de carga
-                    const modal = document.getElementById('editModal');
-                    const modalBody = modal.querySelector('.modal-body');
-                    modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
-                    
-                    // Cargar datos del registro
-                    fetch(`/admin/edit/${captureId}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error al cargar los datos');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            // Restaurar el contenido del modal
-                            modalBody.innerHTML = `
-                                <div id="editErrors" class="alert alert-danger" style="display: none;">
-                                    <ul class="mb-0" id="editErrorsList"></ul>
-                                </div>
-<!--                                <div class="mb-3">
-                                    <label for="edit_invoice_number" class="form-label">Número de Factura</label>
-                                    <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" value="${data.id}" required>
-                                </div>-->
-                                <div class="mb-3">
-                                    <label for="edit_name" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="edit_name" name="name" value="${data.name}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_card_id" class="form-label">Cédula</label>
-                                    <input type="text" class="form-control" id="edit_card_id" name="card_id" value="${data.card_id}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_passport" class="form-label">Passport</label>
-                                    <input type="text" class="form-control" id="edit_passport" name="passport" value="${data.passport || ''}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_cell_phone" class="form-label">Celular</label>
-                                    <input type="text" class="form-control" id="edit_cell_phone" name="cell_phone" value="${data.cell_phone}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_contact_number" class="form-label">Número de Contacto</label>
-                                    <input type="text" class="form-control" id="edit_contact_number" name="contact_number" value="${data.contact_number || ''}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_city" class="form-label">Ciudad</label>
-                                    <input type="text" class="form-control" id="edit_city" name="city" value="${data.city}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_storage" class="form-label">Tienda</label>
-                                    <input type="text" class="form-control" id="edit_storage" name="storage" value="${data.storage}" required>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-primary" onclick="submitEditForm('${captureId}')">Actualizar</button>
-                                </div>
-                            `;
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            modalBody.innerHTML = '<div class="alert alert-danger">Error al cargar los datos del registro. Por favor, inténtalo de nuevo.</div>';
-                        });
-                });
-            });
-
-            // Manejar envío del formulario de edición usando delegación de eventos
-            document.addEventListener('submit', function(e) {
-                console.log('Evento submit capturado:', e.target.id);
-                
-                if (e.target.id === 'editForm') {
-                    e.preventDefault();
-                    console.log('Formulario de edición detectado');
-                    
-                    const submitBtn = e.target.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Actualizando...';
-                    submitBtn.disabled = true;
-                    
-                    const formData = new FormData(e.target);
-                    
-                    // Debug: mostrar los datos que se van a enviar
-                    console.log('Datos a enviar:');
-                    for (let [key, value] of formData.entries()) {
-                        console.log(key + ': ' + value);
-                    }
-                    
-                    console.log('URL de destino:', e.target.action);
-                    
-                    fetch(e.target.action, {
-                        method: 'PUT',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => {
-                        console.log('Respuesta recibida:', response.status);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Datos de respuesta:', data);
-                        if (data.success) {
-                            // Mostrar mensaje de éxito
-                            alert(data.message);
-                            // Recargar la página para mostrar los cambios
-                            location.reload();
-                        } else {
-                            // Mostrar errores
-                            const editErrors = document.getElementById('editErrors');
-                            const editErrorsList = document.getElementById('editErrorsList');
-                            if (editErrors && editErrorsList) {
-                                editErrors.style.display = 'block';
-                                editErrorsList.innerHTML = '';
-                                if (data.message) {
-                                    const li = document.createElement('li');
-                                    li.textContent = data.message;
-                                    editErrorsList.appendChild(li);
-                                }
-                            } else {
-                                alert(data.message || 'Error al actualizar el registro');
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error en fetch:', error);
-                        alert('Error al actualizar el registro. Por favor, inténtalo de nuevo.');
-                    })
-                    .finally(() => {
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
+                thumbnails.forEach(img => {
+                    img.addEventListener('click', () => {
+                        const imageUrl = img.getAttribute('data-image');
+                        modalImage.src = imageUrl;
+                        downloadBtn.href = imageUrl;
                     });
-                }
-            });
-            
-            // También agregar un listener específico para el modal de edición
-            document.addEventListener('click', function(e) {
-                if (e.target && e.target.closest('#editModal')) {
-                    const form = e.target.closest('#editModal').querySelector('form');
-                    if (form && !form.hasAttribute('data-submit-listener')) {
-                        form.setAttribute('data-submit-listener', 'true');
-                        form.addEventListener('submit', function(e) {
-                            e.preventDefault();
-                            console.log('Submit desde modal detectado');
-                            
-                            const formData = new FormData(this);
-                            console.log('Datos del modal:');
-                            for (let [key, value] of formData.entries()) {
-                                console.log(key + ': ' + value);
-                            }
-                            
-                            fetch(this.action, {
-                                method: 'PUT',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(data.message);
-                                    location.reload();
-                                } else {
-                                    alert(data.message || 'Error al actualizar');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('Error al actualizar el registro');
-                            });
-                        });
+                });
+
+                modal?.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        bsModal?.hide();
                     }
-                }
+                });
+
+                // Eliminar
+                const deleteName = document.getElementById('deleteName');
+                const deleteForm = document.getElementById('deleteForm');
+
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const name = this.getAttribute('data-name');
+                        const url = this.getAttribute('data-url');
+                        deleteName.textContent = name;
+                        deleteForm.setAttribute('action', url);
+                    });
+                });
+
+                // Subir imagen
+                const captureIdInput = document.getElementById('captureId');
+                document.querySelectorAll('.upload-image-btn').forEach(button => {
+                    button.addEventListener('click', function () {
+                        captureIdInput.value = this.getAttribute('data-id');
+                    });
+                });
+
+                // Editar: cargar datos y setear el action del form
+                const editForm = document.getElementById('editForm');
+                const editSubmitBtn = document.getElementById('editSubmitBtn');
+                const editErrors = document.getElementById('editErrors');
+                const editErrorsList = document.getElementById('editErrorsList');
+
+                const editCode = document.getElementById('edit_Code');
+                const editDescription = document.getElementById('edit_Description');
+                const editDepartment = document.getElementById('edit_department');
+                const editSucursal = document.getElementById('edit_sucursal');
+                const editCollaborator = document.getElementById('edit_collaborator');
+
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', async function () {
+                        const captureId = this.getAttribute('data-id');
+
+                        editErrors.classList.add('d-none');
+                        editErrorsList.innerHTML = '';
+
+                        editSubmitBtn.disabled = true;
+                        editSubmitBtn.textContent = 'Cargando...';
+
+                        try {
+                            const response = await fetch(`/admin/edit/${captureId}`);
+                            if (!response.ok) throw new Error('Error al cargar los datos');
+
+                            const data = await response.json();
+
+                            editCode.value = data.Code || '';
+                            editDescription.value = data.Description || '';
+                            editDepartment.value = data.department || '';
+                            editSucursal.value = data.sucursal || '';
+                            editCollaborator.value = data.collaborator || '';
+
+                            // Ajusta si tu endpoint update es distinto
+                            editForm.action = `/admin/update/${captureId}`;
+                        } catch (err) {
+                            editErrors.classList.remove('d-none');
+                            const li = document.createElement('li');
+                            li.textContent = 'No se pudieron cargar los datos del registro. Intenta de nuevo.';
+                            editErrorsList.appendChild(li);
+                        } finally {
+                            editSubmitBtn.disabled = false;
+                            editSubmitBtn.textContent = 'Actualizar';
+                        }
+                    });
+                });
+
+                // Submit edición
+                editForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    editErrors.classList.add('d-none');
+                    editErrorsList.innerHTML = '';
+
+                    editSubmitBtn.disabled = true;
+                    const originalText = editSubmitBtn.textContent;
+                    editSubmitBtn.textContent = 'Actualizando...';
+
+                    try {
+                        const formData = new FormData(editForm);
+
+                        const response = await fetch(editForm.action, {
+                            method: 'POST', // con _method=PUT
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            alert(data.message || 'Registro actualizado');
+                            location.reload();
+                            return;
+                        }
+
+                        editErrors.classList.remove('d-none');
+                        const li = document.createElement('li');
+                        li.textContent = data.message || 'Error al actualizar el registro';
+                        editErrorsList.appendChild(li);
+
+                    } catch (err) {
+                        editErrors.classList.remove('d-none');
+                        const li = document.createElement('li');
+                        li.textContent = 'Error inesperado al actualizar. Intenta de nuevo.';
+                        editErrorsList.appendChild(li);
+                    } finally {
+                        editSubmitBtn.disabled = false;
+                        editSubmitBtn.textContent = originalText;
+                    }
+                });
+
             });
-        });
-        
-        // Función global para enviar el formulario de edición
-        function submitEditForm(captureId) {
-            console.log('Función submitEditForm llamada con ID:', captureId);
-            
-            const modal = document.getElementById('editModal');
-            const formData = new FormData();
-            
-            // Recopilar datos del modal
-            const inputs = modal.querySelectorAll('input');
-            inputs.forEach(input => {
-                if (input.name && input.value) {
-                    formData.append(input.name, input.value);
-                    console.log('Agregando campo:', input.name, '=', input.value);
-                }
-            });
-            
-            // Agregar CSRF token
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-            formData.append('_method', 'PUT');
-            
-            console.log('Enviando datos a:', `/admin/update/${captureId}`);
-            
-            fetch(`/admin/update/${captureId}`, {
-                method: 'POST', // Usar POST para que funcione con FormData
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => {
-                console.log('Respuesta recibida:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Datos de respuesta:', data);
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error al actualizar el registro');
-                }
-            })
-            .catch(error => {
-                console.error('Error en fetch:', error);
-                alert('Error al actualizar el registro. Por favor, inténtalo de nuevo.');
-            });
-        }
-    </script>
+        </script>
+    </div>
 </x-app-layout>

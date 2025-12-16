@@ -320,8 +320,12 @@
     <div class="container-fluid px-3" style="max-width: 500px; margin: 0 auto; position: relative; z-index: 10;">
         <!-- Header Section -->
         <div class="header-section text-center">
-            <h2>🎄 ¡Hola, {{ $capture->name }}! 🎅</h2>
+            <h2>🎄 ¡Hola! 🎅</h2>
             <p class="subtitle mb-0">✨ Por favor, envíanos una foto clara de tu factura de compra ✨</p>
+            @if($capture->Description)
+                <p class="subtitle mb-0 mt-2"><strong>Código:</strong> {{ $capture->Code }}</p>
+                <p class="subtitle mb-0"><strong>Descripción:</strong> {{ $capture->Description }}</p>
+            @endif
         </div>
 
         <!-- Error Messages -->
@@ -349,7 +353,7 @@
         <!-- Upload Form -->
         <form id="captureForm"
             method="POST"
-            action="{{ route('capture.submitImage', ['cell_phone' => $capture->cell_phone]) }}"
+            action="{{ route('capture.submitImage', ['code' => $capture->Code]) }}"
             enctype="multipart/form-data"
             class="card p-4 shadow-sm capture-card mb-3">
 

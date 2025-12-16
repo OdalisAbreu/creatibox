@@ -30,13 +30,13 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-Route::get('/capture/{cell_phone}', [CaptureController::class, 'showForm'])
+Route::get('/capture/{code}', [CaptureController::class, 'showForm'])
     ->name('capture.form');
 
 Route::get('/admin/export/preview', [AdminController::class, 'previewPdf'])
     ->name('admin.export.preview');
 
-Route::post('/capture/image/{cell_phone}', [CaptureController::class, 'submitImage'])
+Route::post('/capture/image/{code}', [CaptureController::class, 'submitImage'])
     ->name('capture.submitImage');
 
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);

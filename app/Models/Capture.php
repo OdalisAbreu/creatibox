@@ -9,17 +9,12 @@ class Capture extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'cell_phone',
-        'name',
-       // 'gender',
-        'city',
-        'storage',
-      //  'invoice_number',
-        'contact_number',
-        'card_id',
+        'Code',
+        'Description',
+        'department',
+        'sucursal',
+        'collaborator',
         'completed',
-        'number_send_message',
-        'passport',
     ];
     public function images()
     {

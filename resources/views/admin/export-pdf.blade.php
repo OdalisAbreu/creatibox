@@ -74,12 +74,11 @@
         <thead>
             <tr>
                 <th>No.</th>
-                <th>Nombre</th>
-                <th>Cédula</th>
-                <th>Pasaporte</th>
-                <th>Número de Contacto</th>
-                <th>Ciudad</th>
-                <th>Establecimiento </th>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Departamento</th>
+                <th>Sucursal</th>
+                <th>Colaborador</th>
                 <th>Fecha Registro</th>
                 <th>Imagen</th>
             </tr>
@@ -88,13 +87,12 @@
             @foreach ($captures as $capture)
             <tr>
                 <td>{{ $capture->id }}</td>
-                <td>{{ $capture->name }}</td>
-                <td>{{ $capture->card_id }}</td>
-                <td>{{ $capture->passport ?? '-' }}</td>
-                <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
-                <td>{{ $capture->city }}</td>
-                <td>{{ $capture->storage }}</td>
-                <td> {{ $capture->created_at->format('d/m/Y') }}</td>
+                <td>{{ $capture->Code ?? '-' }}</td>
+                <td>{{ $capture->Description ?? '-' }}</td>
+                <td>{{ $capture->department ?? '-' }}</td>
+                <td>{{ $capture->sucursal ?? '-' }}</td>
+                <td>{{ $capture->collaborator ?? '-' }}</td>
+                <td>{{ $capture->created_at->format('d/m/Y') }}</td>
                 <td>
                     @php
                         $path = $capture->image_path;

@@ -58,13 +58,13 @@
     <div class="container-fluid px-3">
         <div class="error-card">
             <i class="bi bi-exclamation-triangle-fill error-icon"></i>
-            <h1>Cliente no encontrado</h1>
-            <p>{{ $message ?? 'No se encontró el cliente con el número proporcionado.' }}</p>
+            <h1>Registro no encontrado</h1>
+            <p>{{ $message ?? 'No se encontró el registro con el código proporcionado.' }}</p>
             
-            @if(isset($cell_phone))
+            @if(isset($code))
             <div class="mb-3">
-                <small class="text-muted">Número de teléfono:</small>
-                <div class="cell-phone mt-2">{{ $cell_phone }}</div>
+                <small class="text-muted">Código:</small>
+                <div class="cell-phone mt-2">{{ $code }}</div>
             </div>
             @endif
 
