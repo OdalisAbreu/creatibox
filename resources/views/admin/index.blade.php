@@ -102,7 +102,7 @@
                                 <div class="flex-grow-1">
                                     <h6 class="card-title mb-1">
                                         <a href="/capture/{{ $capture->Code }}" class="brand-link text-decoration-none">
-                                            #{{ $capture->id }} - {{ Str::limit($capture->Code, 20) }}
+                                            #{{ ($captures->currentPage() - 1) * $captures->perPage() + $loop->iteration }} - {{ Str::limit($capture->Code, 20) }}
                                         </a>
                                     </h6>
                                     <p class="text-muted small mb-1"><strong>Descripción:</strong> {{ Str::limit($capture->Description, 40) }}</p>
@@ -132,16 +132,15 @@
                                     <i class="fas fa-edit me-1"></i> Editar
                                 </button>
 
-                                @if ($capture->image_id)
-                                    <button type="button"
-                                            class="btn btn-brand-red-dark btn-sm delete-btn flex-fill"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal"
-                                            data-name="{{ $capture->Description }}"
-                                            data-url="{{ route('admin.deleteCapture', $capture->image_id) }}">
-                                        <i class="fas fa-trash-alt me-1"></i> Eliminar
-                                    </button>
-                                @endif
+                                <button type="button"
+                                        class="btn btn-brand-red-dark btn-sm delete-btn flex-fill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        data-name="{{ $capture->Description }}"
+                                        data-code="{{ $capture->Code }}"
+                                        data-url="{{ route('admin.deleteCapture', $capture->id) }}">
+                                    <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                </button>
 
                                 <button type="button"
                                         class="btn btn-brand btn-sm upload-image-btn flex-fill"
@@ -178,10 +177,10 @@
                                     @foreach ($captures as $capture)
                                         <tr>
                                             <td>
-                                                <spam class="brand-link text-decoration-none"
-                                                title="{{ $capture->id }}">
-                                                {{ $capture->id }}
-                                            </spam>
+                                                <span class="brand-link text-decoration-none"
+                                                      title="ID: {{ $capture->id }}">
+                                                    {{ ($captures->currentPage() - 1) * $captures->perPage() + $loop->iteration }}
+                                                </span>
                                             </td>
 
                                             <td class="text-truncate" style="max-width:160px;" title="{{ $capture->Code }}">
@@ -228,17 +227,16 @@
                                                         <i class="fas fa-edit"></i>
                                                     </button>
 
-                                                    @if ($capture->image_id)
-                                                        <button type="button"
-                                                                class="btn btn-brand-red-dark btn-sm delete-btn"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#deleteModal"
-                                                                data-name="{{ $capture->Description }}"
-                                                                data-url="{{ route('admin.deleteCapture', $capture->image_id) }}"
-                                                                title="Eliminar">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    @endif
+                                                    <button type="button"
+                                                            class="btn btn-brand-red-dark btn-sm delete-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteModal"
+                                                            data-name="{{ $capture->Description }}"
+                                                            data-code="{{ $capture->Code }}"
+                                                            data-url="{{ route('admin.deleteCapture', $capture->id) }}"
+                                                            title="Eliminar">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
 
                                                     <button type="button"
                                                             class="btn btn-brand btn-sm upload-image-btn"
@@ -348,7 +346,14 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
-                        ¿Estás seguro de que deseas eliminar la factura de <strong id="deleteName"></strong>?
+                        <p>¿Estás seguro de que deseas eliminar el registro completo?</p>
+                        <div class="alert alert-warning mb-0">
+                            <strong>Descripción:</strong> <span id="deleteName"></span><br>
+                            <strong>Código:</strong> <span id="deleteCode"></span>
+                        </div>
+                        <p class="text-danger small mt-2 mb-0">
+                            <i class="fas fa-exclamation-triangle"></i> Esta acción eliminará el registro y todas sus imágenes asociadas. Esta acción no se puede deshacer.
+                        </p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-brand-outline" data-bs-dismiss="modal">Cancelar</button>
@@ -833,13 +838,16 @@
 
                 // Eliminar
                 const deleteName = document.getElementById('deleteName');
+                const deleteCode = document.getElementById('deleteCode');
                 const deleteForm = document.getElementById('deleteForm');
 
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', function () {
                         const name = this.getAttribute('data-name');
+                        const code = this.getAttribute('data-code');
                         const url = this.getAttribute('data-url');
-                        deleteName.textContent = name;
+                        deleteName.textContent = name || 'N/A';
+                        deleteCode.textContent = code || 'N/A';
                         deleteForm.setAttribute('action', url);
                     });
                 });

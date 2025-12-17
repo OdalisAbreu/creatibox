@@ -27,12 +27,27 @@
 
         th,
         td {
-            border: 1px solid #ddd;
-            padding: 4px 6px;
+            border: 1px solid #425968;
+            padding: 6px 8px;
         }
 
         th {
-            background: #f1f1f1;
+            background: #C41230;
+            color: #FFFFFF;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: #FFFFFF;
+        }
+
+        tbody td {
+            color: #333;
         }
 
         img {

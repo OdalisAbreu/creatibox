@@ -146,16 +146,35 @@ class AdminController extends Controller
 
     public function deleteCapture($id)
     {
-        $captureImage = CaptureImage::find($id);
-        $captureImage->delete();
-        //valida si el usuario no tiene imagenes y si no las tiene cambia el estado a 0
-        $capture = Capture::find($captureImage->capture_id);
-        if ($capture->images()->count() == 0) {
-            $capture->update(['completed' => false]);
+        try {
+            // Buscar el registro Capture
+            $capture = Capture::findOrFail($id);
+            
+            // Obtener todas las imágenes asociadas
+            $images = CaptureImage::where('capture_id', $capture->id)->get();
+            
+            // Eliminar los archivos físicos del almacenamiento
+            foreach ($images as $image) {
+                if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+            }
+            
+            // Eliminar todas las imágenes de la base de datos
+            CaptureImage::where('capture_id', $capture->id)->delete();
+            
+            // Eliminar el registro Capture completo
+            $capture->delete();
+            
+            return redirect()->route('dashboard')->with('success', 'Registro eliminado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar el registro:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('dashboard')->with('error', 'Error al eliminar el registro: ' . $e->getMessage());
         }
-        // Eliminar la imagen del almacenamiento
-
-        return redirect()->route('dashboard')->with('success', 'Capture deleted successfully.');
     }
 
     public function previewPdf()
