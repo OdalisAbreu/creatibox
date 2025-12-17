@@ -199,8 +199,11 @@ class AdminController extends Controller
         // Eliminar todos los registros anteriores de la base de datos
         CaptureImage::where('capture_id', $capture->id)->delete();
 
-        // Guardar la nueva imagen en el almacenamiento
-        $path = $request->file('image')->store('invoices', 'public');
+        // Guardar la nueva imagen en el almacenamiento con el nombre del código
+        $file = $request->file('image');
+        $extension = $file->getClientOriginalExtension();
+        $fileName = $capture->Code . '.' . $extension;
+        $path = $file->storeAs('invoices', $fileName, 'public');
 
         // Crear un nuevo registro con la nueva imagen
         CaptureImage::create([
@@ -217,14 +220,24 @@ class AdminController extends Controller
     public function storeCapture(Request $request)
     {
         try {
-            // Validar campos requeridos
+            // Validar campos requeridos incluyendo que Code sea único
             $request->validate([
-                'Code' => 'required|string',
+                'Code' => 'required|string|unique:captures,Code',
                 'Description' => 'required|string',
                 'department' => 'required|string',
                 'sucursal' => 'required|string',
                 'collaborator' => 'required|string',
                 'invoice_image' => 'required|image|max:5072'
+            ], [
+                'Code.required' => 'El campo código es obligatorio.',
+                'Code.unique' => 'Este código ya está registrado. Por favor, use un código diferente.',
+                'Description.required' => 'El campo descripción es obligatorio.',
+                'department.required' => 'El campo departamento es obligatorio.',
+                'sucursal.required' => 'El campo sucursal es obligatorio.',
+                'collaborator.required' => 'El campo colaborador es obligatorio.',
+                'invoice_image.required' => 'La imagen es obligatoria.',
+                'invoice_image.image' => 'El archivo debe ser una imagen.',
+                'invoice_image.max' => 'La imagen no debe ser mayor a 5MB.',
             ]);
 
             // Crear el registro de captura
@@ -237,8 +250,11 @@ class AdminController extends Controller
                 'completed' => true,
             ]);
 
-            // Guardar la imagen en el almacenamiento
-            $path = $request->file('invoice_image')->store('invoices', 'public');
+            // Guardar la imagen en el almacenamiento con el nombre del código
+            $file = $request->file('invoice_image');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = $request->Code . '.' . $extension;
+            $path = $file->storeAs('invoices', $fileName, 'public');
 
             // Crear el registro de la imagen
             CaptureImage::create([
@@ -247,17 +263,23 @@ class AdminController extends Controller
             ]);
 
             return redirect()->route('dashboard')->with('success', 'Registro creado correctamente.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == 23000) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['Code' => 'Este código ya está registrado.']);
-            }
-            throw $e;
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors($e->errors());
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Fallback por si la validación no captura el error de unique
+            if ($e->getCode() == 23000) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['Code' => 'Este código ya está registrado. Por favor, use un código diferente.']);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Error al crear registro: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['general' => 'Ocurrió un error al crear el registro. Por favor, inténtelo de nuevo.']);
         }
     }
 

@@ -82,8 +82,11 @@ class CaptureController extends Controller
                 return redirect()->back()->with('error', 'No se encontró el registro. Por favor, verifica el código.');
             }
 
-            // Guarda en storage/app/public/invoices y retorna el path relativo
-            $path = $request->file('invoice_image')->store("invoices", 'public');
+            // Guarda en storage/app/public/invoices con el nombre del código
+            $file = $request->file('invoice_image');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = $capture->Code . '.' . $extension;
+            $path = $file->storeAs('invoices', $fileName, 'public');
 
             // Guarda el path accesible públicamente con Storage::url()
             CaptureImage::create([

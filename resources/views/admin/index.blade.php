@@ -114,8 +114,12 @@
                                 @if($capture->image_path)
                                     <img src="{{ asset('storage/' . $capture->image_path) }}"
                                          alt="Imagen"
-                                         class="rounded object-fit-cover flex-shrink-0"
-                                         style="width:80px;height:80px;">
+                                         class="rounded object-fit-cover flex-shrink-0 cursor-pointer"
+                                         style="width:80px;height:80px;cursor:pointer;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#modalFactura"
+                                         data-image="{{ asset('storage/' . $capture->image_path) }}"
+                                         data-code="{{ $capture->Code }}">
                                 @endif
                             </div>
 
@@ -174,11 +178,10 @@
                                     @foreach ($captures as $capture)
                                         <tr>
                                             <td>
-                                                <a class="brand-link text-decoration-none"
-                                                   href="/capture/{{ $capture->Code }}"
-                                                   title="{{ $capture->id }}">
-                                                    {{ $capture->id }}
-                                                </a>
+                                                <spam class="brand-link text-decoration-none"
+                                                title="{{ $capture->id }}">
+                                                {{ $capture->id }}
+                                            </spam>
                                             </td>
 
                                             <td class="text-truncate" style="max-width:160px;" title="{{ $capture->Code }}">
@@ -204,7 +207,11 @@
                                                     <img src="{{ asset('storage/' . $capture->image_path) }}"
                                                          alt="Imagen"
                                                          class="rounded object-fit-cover"
-                                                         style="width:72px;height:72px;">
+                                                         style="width:72px;height:72px;cursor:pointer;"
+                                                         data-bs-toggle="modal"
+                                                         data-bs-target="#modalFactura"
+                                                         data-image="{{ asset('storage/' . $capture->image_path) }}"
+                                                         data-code="{{ $capture->Code }}">
                                                 @else
                                                     <span class="text-muted small">Sin imagen</span>
                                                 @endif
@@ -263,17 +270,74 @@
 
         <!-- Modal de imagen con botón de descarga -->
         <div class="modal fade" id="modalFactura" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-md">
-                <div class="modal-content brand-modal rounded shadow p-3 position-relative">
-                    <div class="modal-body text-center">
-                        <img id="modalImage" src="" alt="Factura Grande" class="img-fluid rounded mb-3 mx-auto d-block" style="max-height: 75vh;">
-                        <a id="downloadBtn" href="#" class="btn btn-brand-outline" download target="_blank">
-                            <i class="fas fa-download me-1"></i> Descargar Factura
-                        </a>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content brand-modal rounded shadow position-relative">
+                    <div class="modal-header brand-modal-header">
+                        <h5 class="modal-title" id="modalImageTitle">Imagen - <span id="modalCode"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body text-center p-2 p-md-3">
+                        <div class="image-container-responsive">
+                            <img id="modalImage" src="" alt="Imagen" class="img-fluid rounded mb-3 mx-auto d-block">
+                        </div>
+                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                            <a id="downloadBtn" href="#" class="btn btn-brand" download>
+                                <i class="fas fa-download me-1"></i> Descargar Imagen
+                            </a>
+                            <button type="button" class="btn btn-brand-outline" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i> Cerrar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <style>
+            .image-container-responsive {
+                max-height: 70vh;
+                overflow: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #modalImage {
+                max-width: 100%;
+                max-height: 70vh;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
+
+            @media (max-width: 767px) {
+                .modal-dialog.modal-lg {
+                    max-width: 95vw;
+                    margin: 0.5rem;
+                }
+
+                .image-container-responsive {
+                    max-height: 60vh;
+                }
+
+                #modalImage {
+                    max-height: 60vh;
+                }
+
+                .modal-body {
+                    padding: 1rem !important;
+                }
+            }
+
+            .cursor-pointer {
+                cursor: pointer;
+                transition: opacity 0.2s;
+            }
+
+            .cursor-pointer:hover {
+                opacity: 0.8;
+            }
+        </style>
 
         <!-- Modal de confirmación de eliminación -->
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -336,19 +400,26 @@
                         </div>
                         <div class="modal-body">
                             @if ($errors->any())
-                                <div class="alert brand-alert">
-                                    <ul class="mb-0">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong><i class="fas fa-exclamation-triangle"></i> Errores encontrados:</strong>
+                                    <ul class="mb-0 mt-2">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
                                         @endforeach
                                     </ul>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             @endif
 
                             <div class="mb-3">
-                                <label for="Code" class="form-label">Código</label>
-                                <input type="text" class="form-control brand-input @error('Code') is-invalid @enderror" id="Code" name="Code" value="{{ old('Code') }}" required>
-                                @error('Code') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label for="Code" class="form-label">Código <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control brand-input @error('Code') is-invalid @enderror" id="Code" name="Code" value="{{ old('Code') }}" required autofocus>
+                                @error('Code')
+                                    <div class="invalid-feedback d-block">
+                                        <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                                    </div>
+                                @enderror
+                                <small class="form-text text-muted">El código debe ser único</small>
                             </div>
 
                             <div class="mb-3">
@@ -730,13 +801,26 @@
                 const modal = document.getElementById('modalFactura');
                 const modalImage = document.getElementById('modalImage');
                 const downloadBtn = document.getElementById('downloadBtn');
+                const modalCode = document.getElementById('modalCode');
                 const thumbnails = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#modalFactura"]');
 
                 thumbnails.forEach(img => {
                     img.addEventListener('click', () => {
                         const imageUrl = img.getAttribute('data-image');
+                        const code = img.getAttribute('data-code');
+                        
                         modalImage.src = imageUrl;
                         downloadBtn.href = imageUrl;
+                        
+                        // Obtener la extensión del archivo para el nombre de descarga
+                        const urlParts = imageUrl.split('.');
+                        const extension = urlParts[urlParts.length - 1];
+                        downloadBtn.download = code ? `${code}.${extension}` : 'imagen.' + extension;
+                        
+                        // Actualizar el código en el título del modal
+                        if (modalCode) {
+                            modalCode.textContent = code || 'N/A';
+                        }
                     });
                 });
 
@@ -789,6 +873,7 @@
 
                         editSubmitBtn.disabled = true;
                         editSubmitBtn.textContent = 'Cargando...';
+                        showLoading();
 
                         try {
                             const response = await fetch(`/admin/edit/${captureId}`);
@@ -812,6 +897,7 @@
                         } finally {
                             editSubmitBtn.disabled = false;
                             editSubmitBtn.textContent = 'Actualizar';
+                            hideLoading();
                         }
                     });
                 });
@@ -826,6 +912,7 @@
                     editSubmitBtn.disabled = true;
                     const originalText = editSubmitBtn.textContent;
                     editSubmitBtn.textContent = 'Actualizando...';
+                    showLoading();
 
                     try {
                         const formData = new FormData(editForm);
@@ -859,10 +946,172 @@
                     } finally {
                         editSubmitBtn.disabled = false;
                         editSubmitBtn.textContent = originalText;
+                        hideLoading();
                     }
                 });
 
             });
         </script>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 text-muted">Procesando...</p>
+            </div>
+        </div>
+
+        <style>
+            .loading-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .loading-spinner {
+                text-align: center;
+                background: white;
+                padding: 2rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .spinner-border {
+                border-width: 0.25em;
+            }
+        </style>
+
+        <script>
+            // Función para mostrar loading
+            function showLoading() {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            }
+
+            // Función para ocultar loading
+            function hideLoading() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+
+            // Función para limpiar el formulario de nuevo registro
+            function clearNewCaptureForm() {
+                const form = document.getElementById('newCaptureForm');
+                if (form) {
+                    form.reset();
+                    // Limpiar clases de error
+                    form.querySelectorAll('.is-invalid').forEach(el => {
+                        el.classList.remove('is-invalid');
+                    });
+                    // Limpiar mensajes de error
+                    form.querySelectorAll('.invalid-feedback').forEach(el => {
+                        el.remove();
+                    });
+                    // Limpiar alertas
+                    const alert = form.querySelector('.alert-danger');
+                    if (alert) {
+                        alert.remove();
+                    }
+                    // Resetear selects a su primera opción
+                    form.querySelectorAll('select').forEach(select => {
+                        select.selectedIndex = 0;
+                    });
+                }
+            }
+
+            // Manejar el modal de nuevo registro
+            const newCaptureModal = document.getElementById('newCaptureModal');
+            
+            if (newCaptureModal) {
+                // NO limpiar cuando se abre el modal si hay errores (para mantener los valores)
+                newCaptureModal.addEventListener('show.bs.modal', function() {
+                    // Solo limpiar si no hay errores de validación
+                    const hasFormErrors = document.querySelector('#newCaptureForm .alert-danger') !== null ||
+                                         document.querySelectorAll('#newCaptureForm .is-invalid').length > 0;
+                    if (!hasFormErrors) {
+                        clearNewCaptureForm();
+                    }
+                });
+
+                // NO limpiar cuando se cierra el modal si hay errores (para mantener los valores)
+                newCaptureModal.addEventListener('hidden.bs.modal', function() {
+                    // Solo limpiar si no hay errores de validación
+                    const hasFormErrors = document.querySelector('#newCaptureForm .alert-danger') !== null ||
+                                         document.querySelectorAll('#newCaptureForm .is-invalid').length > 0;
+                    if (!hasFormErrors) {
+                        clearNewCaptureForm();
+                    }
+                });
+            }
+        </script>
+
+        @if($errors->any())
+        <script>
+            // Abrir el modal automáticamente si hay errores
+            document.addEventListener('DOMContentLoaded', function() {
+                const modal = new bootstrap.Modal(document.getElementById('newCaptureModal'));
+                modal.show();
+            });
+        </script>
+        @endif
+
+        <script>
+        </script>
+
+        @if(session('success'))
+        <script>
+            // Limpiar formulario si hay mensaje de éxito al cargar la página
+            document.addEventListener('DOMContentLoaded', function() {
+                clearNewCaptureForm();
+                // Cerrar el modal si está abierto
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newCaptureModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            });
+        </script>
+        @endif
+
+        <script>
+
+            // Loading para formulario de nuevo registro
+            document.getElementById('newCaptureForm')?.addEventListener('submit', function(e) {
+                showLoading();
+            });
+
+            // Loading para formulario de subir imagen
+            document.getElementById('uploadImageForm')?.addEventListener('submit', function(e) {
+                showLoading();
+            });
+
+            // Loading para formulario de eliminar
+            document.getElementById('deleteForm')?.addEventListener('submit', function(e) {
+                showLoading();
+            });
+
+            // Loading para formulario de edición
+            document.getElementById('editForm')?.addEventListener('submit', function(e) {
+                showLoading();
+            });
+
+            // Ocultar loading cuando la página se carga completamente
+            window.addEventListener('load', function() {
+                hideLoading();
+            });
+        </script>
+
+        @if($errors->any())
+        <script>
+            // Ocultar loading si hay errores de validación (cuando se recarga la página con errores)
+            hideLoading();
+        </script>
+        @endif
     </div>
 </x-app-layout>

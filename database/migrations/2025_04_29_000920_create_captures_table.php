@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('captures', function (Blueprint $table) {
             $table->id();
-            $table->string('Code');
+            $table->string('Code')->unique();
             $table->string('Description');
             $table->string('department');
             $table->string('sucursal')->nullable();
