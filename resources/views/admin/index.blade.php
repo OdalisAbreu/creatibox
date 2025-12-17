@@ -74,6 +74,7 @@
                                             <option value="GESTION DEL TALENTO HUMANO" {{ request('department') == 'GESTION DEL TALENTO HUMANO' ? 'selected' : '' }}>GESTION DEL TALENTO HUMANO</option>
                                             <option value="MERCADEO Y COMUNICACIONES" {{ request('department') == 'MERCADEO Y COMUNICACIONES' ? 'selected' : '' }}>MERCADEO Y COMUNICACIONES</option>
                                             <option value="OPERACIONES" {{ request('department') == 'OPERACIONES' ? 'selected' : '' }}>OPERACIONES</option>
+                                            <option value="TECNOLOGÍA" {{ request('department') == 'TECNOLOGÍA' ? 'selected' : '' }}>TECNOLOGÍA</option>
                                         </select>
                                     </div>
                                 </div>
@@ -445,6 +446,7 @@
                                     <option value="GESTION DEL TALENTO HUMANO" {{ old('department') == 'GESTION DEL TALENTO HUMANO' ? 'selected' : '' }}>GESTION DEL TALENTO HUMANO</option>
                                     <option value="MERCADEO Y COMUNICACIONES" {{ old('department') == 'MERCADEO Y COMUNICACIONES' ? 'selected' : '' }}>MERCADEO Y COMUNICACIONES</option>
                                     <option value="OPERACIONES" {{ old('department') == 'OPERACIONES' ? 'selected' : '' }}>OPERACIONES</option>
+                                    <option value="TECNOLOGÍA" {{ old('department') == 'TECNOLOGÍA' ? 'selected' : '' }}>TECNOLOGÍA</option>
                                 </select>
                                 @error('department') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
@@ -604,6 +606,7 @@
                                     <option value="GESTION DEL TALENTO HUMANO">GESTION DEL TALENTO HUMANO</option>
                                     <option value="MERCADEO Y COMUNICACIONES">MERCADEO Y COMUNICACIONES</option>
                                     <option value="OPERACIONES">OPERACIONES</option>
+                                    <option value="TECNOLOGÍA">TECNOLOGÍA</option>
                                 </select>
                             </div>
 
