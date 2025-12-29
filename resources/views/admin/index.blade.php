@@ -53,7 +53,7 @@
                         <div class="card-body">
                             <form method="GET">
                                 <div class="row g-2">
-                                    <div class="col-12 col-md-5">
+                                    <div class="col-12 col-md-4">
                                         <label class="form-label small mb-1 text-muted">Código</label>
                                         <input type="text"
                                                name="code"
@@ -62,7 +62,7 @@
                                                placeholder="Ej: ABC-123">
                                     </div>
 
-                                    <div class="col-12 col-md-7">
+                                    <div class="col-12 col-md-4">
                                         <label class="form-label small mb-1 text-muted">Departamento</label>
                                         <select name="department" class="form-select brand-input">
                                             <option value="">Todos los departamentos</option>
@@ -76,6 +76,24 @@
                                             <option value="OPERACIONES" {{ request('department') == 'OPERACIONES' ? 'selected' : '' }}>OPERACIONES</option>
                                             <option value="TECNOLOGÍA" {{ request('department') == 'TECNOLOGÍA' ? 'selected' : '' }}>TECNOLOGÍA</option>
                                         </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label small mb-1 text-muted">Fecha Inicio</label>
+                                        <input type="date"
+                                               name="start_date"
+                                               value="{{ request('start_date') }}"
+                                               class="form-control brand-input">
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 mt-2">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label small mb-1 text-muted">Fecha Fin</label>
+                                        <input type="date"
+                                               name="end_date"
+                                               value="{{ request('end_date') }}"
+                                               class="form-control brand-input">
                                     </div>
                                 </div>
 
