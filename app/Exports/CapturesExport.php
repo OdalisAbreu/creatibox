@@ -20,16 +20,14 @@ class CapturesExport implements FromCollection, WithHeadings
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
                 'captures.id',
-            //    'captures.invoice_number',
                 'captures.name',
                 'captures.card_id',
-                'captures.passport',
                 'captures.cell_phone',
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
-                DB::raw("CONCAT('" . url('storage') . "/', capture_images.image_path) AS full_image_path"),
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS completed_status"),
+                DB::raw("CONCAT('" . url('storage') . "/', capture_images.image_path) AS full_image_path"),
                 DB::raw("DATE_FORMAT(captures.created_at, '%d/%m/%Y') AS formatted_created_at")
             );
 
@@ -56,16 +54,15 @@ class CapturesExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'ID', 
-            'Nombre', 
-            'Cédula', 
-            'Pasaporte', 
-            'Celular', 
-            'Número de Contacto', 
-            'Ciudad', 
-            'Almacén', 
-            'Factura', 
-            'Estado', 
+            'ID',
+            'Nombre',
+            'Cédula',
+            'Celular',
+            'Número de Contacto',
+            'Ciudad',
+            'Almacén',
+            'Estado',
+            'Factura',
             'Fecha Registro'
         ];
     }

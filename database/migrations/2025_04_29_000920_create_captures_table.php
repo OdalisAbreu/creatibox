@@ -15,12 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('cell_phone');
             $table->string('name');
-          //  $table->string('gender');
+            $table->string('card_id');
             $table->string('city');
             $table->string('storage');
-          //  $table->string('invoice_number')->nullable();
             $table->string('contact_number')->nullable();
-            $table->string('card_id');
             $table->boolean('completed')->default(false);
             $table->timestamps();
         });

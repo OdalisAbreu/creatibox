@@ -83,8 +83,7 @@
                     <tr>
                         <th>No.</th>
                         <th>Nombre</th>
-                        <th>Cédula o Pasaporte</th>
-                        <!-- <th>Pasaporte</th> -->
+                        <th>Cédula</th>
                         <th>Num. Contacto</th>
                         <th>Estado</th>
                         <th>Factura</th>
@@ -97,7 +96,6 @@
                         <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->id }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->id, 20) }}</a></td>
                         <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
                         <td>{{ $capture->card_id }}</td>
-                       <!-- <td>{{ $capture->passport ?? '-' }}</td> -->
                         <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
                         <td>
                             @if ($capture->completed)
@@ -274,13 +272,6 @@
                             </ul>
                         </div>
                         @endif
-<!--                        <div class="mb-3">
-                            <label for="invoice_number" class="form-label">Número de Factura</label>
-                            <input type="text" class="form-control @error('invoice_number') is-invalid @enderror" id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}" required>
-                            @error('invoice_number')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>-->
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre</label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
@@ -292,13 +283,6 @@
                             <label for="card_id" class="form-label">Cédula</label>
                             <input type="text" class="form-control @error('card_id') is-invalid @enderror" id="card_id" name="card_id" value="{{ old('card_id') }}" required>
                             @error('card_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="passport" class="form-label">Pasaporte</label>
-                            <input type="text" class="form-control @error('passport') is-invalid @enderror" id="passport" name="passport" value="{{ old('passport') }}">
-                            @error('passport')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -364,10 +348,6 @@
                         <div id="editErrors" class="alert alert-danger" style="display: none;">
                             <ul class="mb-0" id="editErrorsList"></ul>
                         </div>
-<!--                        <div class="mb-3">
-                            <label for="edit_invoice_number" class="form-label">Número de Factura</label>
-                            <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" required>
-                        </div>-->
                         <div class="mb-3">
                             <label for="edit_name" class="form-label">Nombre</label>
                             <input type="text" class="form-control" id="edit_name" name="name" required>
@@ -377,12 +357,8 @@
                             <input type="text" class="form-control" id="edit_card_id" name="card_id" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit_passport" class="form-label">Pasaporte</label>
-                            <input type="text" class="form-control" id="edit_passport" name="passport">
-                        </div>
-                        <div class="mb-3">
-                            <label for="cell_phone" class="form-label">Celular</label>
-                            <input type="text" class="form-control" id="cell_phone" name="cell_phone" required>
+                            <label for="edit_cell_phone" class="form-label">Celular</label>
+                            <input type="text" class="form-control" id="edit_cell_phone" name="cell_phone" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit_contact_number" class="form-label">Número de Contacto</label>
@@ -494,10 +470,6 @@
                                 <div id="editErrors" class="alert alert-danger" style="display: none;">
                                     <ul class="mb-0" id="editErrorsList"></ul>
                                 </div>
-<!--                                <div class="mb-3">
-                                    <label for="edit_invoice_number" class="form-label">Número de Factura</label>
-                                    <input type="text" class="form-control" id="edit_invoice_number" name="invoice_number" value="${data.id}" required>
-                                </div>-->
                                 <div class="mb-3">
                                     <label for="edit_name" class="form-label">Nombre</label>
                                     <input type="text" class="form-control" id="edit_name" name="name" value="${data.name}" required>
@@ -505,10 +477,6 @@
                                 <div class="mb-3">
                                     <label for="edit_card_id" class="form-label">Cédula</label>
                                     <input type="text" class="form-control" id="edit_card_id" name="card_id" value="${data.card_id}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_passport" class="form-label">Passport</label>
-                                    <input type="text" class="form-control" id="edit_passport" name="passport" value="${data.passport || ''}">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit_cell_phone" class="form-label">Celular</label>

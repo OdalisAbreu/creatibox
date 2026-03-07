@@ -18,27 +18,17 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
             'password' => bcrypt('password'), // password
         ]);
 
-        User::factory()->create([
-            'name' => 'Joel Medrano',
-            'email' => 'joel@creatibox.com.do',
-            'password' => '$2y$12$MTzjYQ2qi.ctlsNjRqspIengK/AQNvI5fEWS8EhUDwkLvJt6DwuYa', // password
-        ]);
-        User::factory()->create([
-            'name' => 'Stephanie',
-            'email' => 'stephanie@creatibox.com.do',
-            'password' => '$2y$12$vExqygw/0aihd8njy2SrtuzCJijr3oB2QZKJPFJ7lQkfBz9eD43Sm', // password
-        ]);
 
         //add wasapi account
         WasapiAccount::create([
-            'phone' => '18099901415',
-            'token' => '65853|X7le98KtKB5nKCj2ZavGgDrwAYjVIrK34uC6oI2f',
-            'wasapi_id' => '13701',
+            'phone' => '18299387179',
+            'token' => '339512|rZkXM1LIG2GlgZmKZ5EMTK32HHMuOJTrvEKGB0Tgcebcd968',
+            'wasapi_id' => '20349',
             'final_message' => '¡Listo! Tu factura ha sido recibida correctamente. ✅
 
 *¡Gracias por participar en Estrellas de la Navidad!* 🌟

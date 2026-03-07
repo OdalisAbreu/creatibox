@@ -76,10 +76,9 @@
                 <th>No.</th>
                 <th>Nombre</th>
                 <th>Cédula</th>
-                <th>Pasaporte</th>
                 <th>Número de Contacto</th>
                 <th>Ciudad</th>
-                <th>Establecimiento </th>
+                <th>Establecimiento</th>
                 <th>Fecha Registro</th>
                 <th>Imagen</th>
             </tr>
@@ -90,7 +89,6 @@
                 <td>{{ $capture->id }}</td>
                 <td>{{ $capture->name }}</td>
                 <td>{{ $capture->card_id }}</td>
-                <td>{{ $capture->passport ?? '-' }}</td>
                 <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
                 <td>{{ $capture->city }}</td>
                 <td>{{ $capture->storage }}</td>

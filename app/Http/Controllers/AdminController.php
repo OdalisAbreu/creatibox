@@ -84,14 +84,12 @@ class AdminController extends Controller
         $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
             ->select(
                 'captures.id',
-             //   'captures.invoice_number',
                 'captures.name',
                 'captures.card_id',
                 'captures.cell_phone',
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
-                'captures.passport',
                 'captures.completed',
                 'captures.created_at',
                 'capture_images.image_path',
@@ -165,7 +163,6 @@ class AdminController extends Controller
                 'captures.city',
                 'captures.storage',
                 'captures.card_id',
-                'captures.passport',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
@@ -210,13 +207,12 @@ class AdminController extends Controller
             $capture = Capture::create([
                 'cell_phone' => $request->cell_phone,
                 'name' => $request->name,
-             //   'invoice_number' => $request->invoice_number,
                 'contact_number' => $request->contact_number ?? $request->cell_phone,
                 'city' => $request->city ?? '',
                 'storage' => $request->storage ?? '',
                 'card_id' => $card_id,
                 'completed' => true,
-                'passport' => $request->passport ?? '',
+                'number_send_message' => $request->cell_phone,
             ]);
 
             // Guardar la imagen en el almacenamiento
@@ -279,13 +275,11 @@ public function updateCapture(Request $request, $id)
         // Preparar datos para actualizar
         $updateData = [
             'name' => $request->name ?? '',
-           // 'invoice_number' => $request->invoice_number ?? '',
             'cell_phone' => $request->cell_phone,
             'contact_number' => $request->contact_number ?? '',
             'city' => $request->city ?? '',
             'storage' => $request->storage ?? '',
             'card_id' => $card_id,
-            'passport' => $request->passport ?? '',
         ];
         
         // Log para debug
