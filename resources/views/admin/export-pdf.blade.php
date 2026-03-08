@@ -81,6 +81,7 @@
                 <th>Establecimiento</th>
                 <th>Fecha Registro</th>
                 <th>Imagen</th>
+                <th>Tikets asignados</th>
             </tr>
         </thead>
         <tbody>
@@ -105,6 +106,7 @@
                         <span>Imagen no disponible</span>
                     @endif
                 </td>
+                <td>{{ $capture->tikets_asignados ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>

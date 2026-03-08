@@ -22,4 +22,8 @@ class Capture extends Model
     {
         return $this->hasMany(CaptureImage::class);
     }
+    public function tikets()
+    {
+        return $this->hasMany(Tiket::class);
+    }
 }

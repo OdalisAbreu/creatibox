@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Exports\CapturesExport;
 use App\Models\Capture;
 use App\Models\CaptureImage;
+use App\Models\Tiket;
 
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as MPDF;
 use Illuminate\Support\Facades\DB;
@@ -93,7 +94,8 @@ class AdminController extends Controller
                 'captures.completed',
                 'captures.created_at',
                 'capture_images.image_path',
-                DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado")
+                DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
+                DB::raw("(SELECT GROUP_CONCAT(ticket_number ORDER BY id SEPARATOR ', ') FROM tikets WHERE tikets.capture_id = captures.id) AS tikets_asignados")
             );
 
         // Aplicar filtros
@@ -166,7 +168,8 @@ class AdminController extends Controller
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
-                'capture_images.created_at AS invoice_created_at'
+                'capture_images.created_at AS invoice_created_at',
+                DB::raw("(SELECT GROUP_CONCAT(ticket_number ORDER BY id SEPARATOR ', ') FROM tikets WHERE tikets.capture_id = captures.id) AS tikets_asignados")
             )
             ->latest('captures.created_at')
             ->limit(50)            //  ≤50 para que cargue rápido en pantalla
@@ -237,7 +240,8 @@ class AdminController extends Controller
 
 public function editCapture($id)
 {
-    $capture = Capture::findOrFail($id);
+    $capture = Capture::with('tikets')->findOrFail($id);
+    $capture->tikets_array = $capture->tikets->pluck('ticket_number')->values()->all();
     return response()->json($capture);
 }
 
@@ -286,6 +290,21 @@ public function updateCapture(Request $request, $id)
         Log::info('Datos a actualizar:', $updateData);
 
         $capture->update($updateData);
+
+        // Sincronizar Tikets: eliminar existentes y crear los enviados
+        $capture->tikets()->delete();
+        $tikets = $request->input('tikets', []);
+        if (is_array($tikets)) {
+            foreach ($tikets as $ticketNumber) {
+                $ticketNumber = is_string($ticketNumber) ? trim($ticketNumber) : '';
+                if ($ticketNumber !== '') {
+                    Tiket::create([
+                        'capture_id' => $capture->id,
+                        'ticket_number' => $ticketNumber,
+                    ]);
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,

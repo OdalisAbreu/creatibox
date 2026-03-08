@@ -372,6 +372,16 @@
                             <label for="edit_storage" class="form-label">Tienda</label>
                             <input type="text" class="form-control" id="edit_storage" name="storage" required>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Asignar Tikets</label>
+                            <div id="tiketsContainer">
+                                <div class="input-group mb-2 tikets-row">
+                                    <input type="text" class="form-control" name="tikets[]" placeholder="Tk">
+                                    <button type="button" class="btn btn-outline-danger btn-remove-tk" title="Eliminar Tk" aria-label="Eliminar">×</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTiket" title="Agregar otro Tk">+ Agregar Tk</button>
+                        </div>
                     </div>
 
                 </form>
@@ -441,6 +451,38 @@
                 });
             });
 
+            // Helper: construir filas de Tikets para el modal de edición
+            function buildTiketsRows(tiketsArray) {
+                const rowHtml = (value) => `
+                    <div class="input-group mb-2 tikets-row">
+                        <input type="text" class="form-control" name="tikets[]" placeholder="Tk" value="${(value || '').replace(/"/g, '&quot;').replace(/</g, '&lt;')}">
+                        <button type="button" class="btn btn-outline-danger btn-remove-tk" title="Eliminar Tk">×</button>
+                    </div>`;
+                if (!Array.isArray(tiketsArray) || tiketsArray.length === 0) {
+                    return rowHtml('');
+                }
+                return tiketsArray.map(tn => rowHtml(tn)).join('');
+            }
+
+            // Delegación: agregar Tk y eliminar Tk (dentro del modal de edición)
+            document.getElementById('editModal').addEventListener('click', function(e) {
+                const addBtn = e.target.closest('#btnAddTiket');
+                const removeBtn = e.target.closest('.btn-remove-tk');
+                const container = document.getElementById('tiketsContainer');
+                if (addBtn && container) {
+                    e.preventDefault();
+                    const div = document.createElement('div');
+                    div.className = 'input-group mb-2 tikets-row';
+                    div.innerHTML = '<input type="text" class="form-control" name="tikets[]" placeholder="Tk"><button type="button" class="btn btn-outline-danger btn-remove-tk" title="Eliminar Tk">×</button>';
+                    container.appendChild(div);
+                }
+                if (removeBtn && container) {
+                    e.preventDefault();
+                    const row = removeBtn.closest('.tikets-row');
+                    if (row && container.querySelectorAll('.tikets-row').length > 1) row.remove();
+                }
+            });
+
             // Funcionalidad para editar
             const editButtons = document.querySelectorAll('.edit-btn');
             const editForm = document.getElementById('editForm');
@@ -493,6 +535,13 @@
                                 <div class="mb-3">
                                     <label for="edit_storage" class="form-label">Tienda</label>
                                     <input type="text" class="form-control" id="edit_storage" name="storage" value="${data.storage}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Asignar Tikets</label>
+                                    <div id="tiketsContainer">
+                                        ${buildTiketsRows(data.tikets_array)}
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTiket" title="Agregar otro Tk">+ Agregar Tk</button>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

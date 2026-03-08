@@ -28,7 +28,8 @@ class CapturesExport implements FromCollection, WithHeadings
                 'captures.storage',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS completed_status"),
                 DB::raw("CONCAT('" . url('storage') . "/', capture_images.image_path) AS full_image_path"),
-                DB::raw("DATE_FORMAT(captures.created_at, '%d/%m/%Y') AS formatted_created_at")
+                DB::raw("DATE_FORMAT(captures.created_at, '%d/%m/%Y') AS formatted_created_at"),
+                DB::raw("(SELECT GROUP_CONCAT(ticket_number ORDER BY id SEPARATOR ', ') FROM tikets WHERE tikets.capture_id = captures.id) AS tikets_asignados")
             );
 
         // Aplicar filtros
@@ -63,7 +64,8 @@ class CapturesExport implements FromCollection, WithHeadings
             'Almacén',
             'Estado',
             'Factura',
-            'Fecha Registro'
+            'Fecha Registro',
+            'Tikets asignados'
         ];
     }
 }
