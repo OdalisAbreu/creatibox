@@ -1,112 +1,54 @@
-{{-- resources/views/capture/upload.blade.php --}}
+{{-- resources/views/capture/form.blade.php – Promo "Arma tu combo y gana" --}}
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <title>Subir Factura – FacturaCapture</title>
-
-    {{-- 1. Meta viewport para móviles --}}
+    <title>Subir Factura – Promo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{-- Bootstrap & Icons --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
         :root {
-            --fc-green: #008037;
-            --fc-blue: #0065B3;
-            --bs-primary: var(--fc-green);
-            --christmas-red: #dc3545;
-            --christmas-green: #28a745;
-            --christmas-gold: #ffc107;
+            --brand-red: #c41e3a;
+            --brand-red-dark: #a01830;
+            --brand-white: #ffffff;
+            --accent-orange: #f59e0b;
+            --shadow-gray: rgba(0, 0, 0, 0.08);
+            --text-muted: #666666;
         }
 
         body {
             font-family: "Poppins", Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #e8f5e9 0%, #fff3e0 50%, #fce4ec 100%);
+            background: linear-gradient(180deg, #fef2f2 0%, #fff 50%);
             padding: 1rem 0;
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Efecto de nieve */
-        .snowflake {
-            position: fixed;
-            top: -10px;
-            color: white;
-            font-size: 1em;
-            font-family: Arial;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-            animation: fall linear infinite;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-            }
-        }
-
-        /* Decoraciones navideñas */
-        .christmas-decoration {
-            position: absolute;
-            font-size: 1.5rem;
-            animation: float 3s ease-in-out infinite;
-            z-index: 1;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .decoration-left {
-            left: 10px;
-            top: 20%;
-        }
-
-        .decoration-right {
-            right: 10px;
-            top: 30%;
         }
 
         .header-section {
-            background: linear-gradient(135deg, var(--christmas-red) 0%, #c82333 50%, var(--christmas-green) 100%);
-            color: white;
+            background: var(--brand-red);
+            color: var(--brand-white);
             padding: 2rem 1.5rem;
             border-radius: 1rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(196, 30, 58, 0.25);
+            text-align: center;
         }
 
-        .header-section::before {
-            content: '🎄';
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            font-size: 2rem;
-            opacity: 0.3;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .header-section::after {
-            content: '🎅';
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            font-size: 2rem;
-            opacity: 0.3;
-            animation: float 3s ease-in-out infinite 1.5s;
+        .header-section .promo-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            opacity: 0.95;
+            margin-bottom: 0.5rem;
         }
 
         .header-section h2 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
@@ -116,22 +58,29 @@
             opacity: 0.95;
         }
 
-        .instructions-card {
-            background: white;
+        .instructions-card,
+        .example-section {
+            background: var(--brand-white);
             border-radius: 1rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 12px var(--shadow-gray);
+            border: 1px solid rgba(196, 30, 58, 0.1);
         }
 
-        .instructions-card h3 {
-            color: var(--christmas-red);
-            font-size: 1.1rem;
+        .instructions-card h3,
+        .example-section h4 {
+            color: var(--brand-red);
+            font-size: 1.05rem;
             font-weight: 600;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .example-section h4 {
+            justify-content: center;
         }
 
         .requirements-list {
@@ -155,35 +104,18 @@
         }
 
         .requirements-list li .icon {
-            color: var(--christmas-green);
+            color: var(--brand-red);
             font-size: 1.2rem;
             margin-top: 0.1rem;
             flex-shrink: 0;
-        }
-
-        .example-section {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .example-section h4 {
-            color: var(--christmas-red);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
         }
 
         .example-image-container {
             position: relative;
             border-radius: 0.75rem;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border: 3px solid var(--christmas-green);
-            border-style: dashed;
+            box-shadow: 0 2px 12px var(--shadow-gray);
+            border: 2px dashed var(--brand-red);
         }
 
         .example-image-container img {
@@ -196,49 +128,39 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: linear-gradient(135deg, var(--christmas-red) 0%, var(--christmas-green) 100%);
-            color: white;
+            background: var(--brand-red);
+            color: var(--brand-white);
             padding: 0.4rem 0.8rem;
             border-radius: 0.5rem;
             font-size: 0.75rem;
             font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* 2. Card ocupa casi todo el ancho en móviles */
         .capture-card {
             width: 90vw;
             max-width: 420px;
             margin: 0 auto;
             border-radius: 1rem;
-            border: 0;
-            background: white;
+            border: 2px solid var(--brand-red);
+            background: var(--brand-white);
+            box-shadow: 0 4px 20px var(--shadow-gray);
         }
 
-        /* 3. Botón cámara escala con viewport width - Estilo Navideño */
         .camera-label {
             width: 50vw;
             height: 50vw;
             max-width: 160px;
             max-height: 150px;
             border-radius: 35%;
-            background: var(--christmas-green);
+            background: var(--brand-red);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: var(--brand-white);
             font-size: clamp(3rem, 15vw, 8rem);
-            box-shadow: 0 .5rem 1rem rgba(40, 167, 69, 0.4), 0 0 20px rgba(40, 167, 69, 0.3);
-            transition: all .3s ease-in;
+            box-shadow: 0 4px 16px rgba(196, 30, 58, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
-            overflow: hidden;
-        }
-
-        .camera-label::before {
-            content: '📸';
-            position: absolute;
-            font-size: 2rem;
-            animation: pulse 2s ease-in-out infinite;
         }
 
         .camera-label i {
@@ -246,36 +168,29 @@
             z-index: 1;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
         .camera-label:hover,
         .camera-label:focus {
-            transform: scale(1.05) rotate(5deg);
+            transform: scale(1.05);
             cursor: pointer;
-            background: #218838;
-            box-shadow: 0 .8rem 1.5rem rgba(40, 167, 69, 0.5), 0 0 30px rgba(40, 167, 69, 0.4);
+            background: var(--brand-red-dark);
+            box-shadow: 0 6px 20px rgba(196, 30, 58, 0.45);
         }
 
-        /* Ocultamos el input real */
         #invoice_image {
             position: absolute;
             left: -9999px;
         }
 
-        /* Overlay de carga */
         .loading-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(255, 255, 255, .8);
+            background: rgba(255, 255, 255, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1055;
             font-size: 1.25rem;
-            color: var(--fc-blue);
+            color: var(--brand-red);
         }
 
         .loading-overlay.show {
@@ -283,7 +198,7 @@
         }
 
         .info-text {
-            color: #6c757d;
+            color: var(--text-muted);
             font-size: 0.85rem;
             text-align: center;
             margin-top: 1rem;
@@ -296,11 +211,12 @@
                 height: 200px;
                 font-size: 5rem;
             }
-
             .header-section {
                 padding: 2.5rem 2rem;
             }
-
+            .header-section h2 {
+                font-size: 1.75rem;
+            }
             .instructions-card,
             .example-section {
                 padding: 2rem;
@@ -310,26 +226,18 @@
 </head>
 
 <body>
-    <!-- Efecto de nieve -->
-    <div id="snowflakes"></div>
-
-    <!-- Decoraciones navideñas -->
-    <div class="christmas-decoration decoration-left">🎄</div>
-    <div class="christmas-decoration decoration-right">🎁</div>
-
-    <div class="container-fluid px-3" style="max-width: 500px; margin: 0 auto; position: relative; z-index: 10;">
-        <!-- Header Section -->
-        <div class="header-section text-center">
-            <h2>🎄 ¡Hola, {{ $capture->name }}! 🎅</h2>
-            <p class="subtitle mb-0">✨ Por favor, envíanos una foto clara de tu factura de compra ✨</p>
+    <div class="container-fluid px-3" style="max-width: 500px; margin: 0 auto;">
+        <div class="header-section">
+            <div class="promo-badge">ARMA TU COMBO Y GANA</div>
+            <h2>¡Hola, {{ $capture->name }}!</h2>
+            <p class="subtitle mb-0">Por favor, envíanos una foto clara de tu factura de compra.</p>
         </div>
 
-        <!-- Error Messages -->
         @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
         @endif
 
@@ -342,16 +250,15 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
         @endif
 
-        <!-- Upload Form -->
         <form id="captureForm"
             method="POST"
             action="{{ route('capture.submitImage', ['cell_phone' => $capture->cell_phone]) }}"
             enctype="multipart/form-data"
-            class="card p-4 shadow-sm capture-card mb-3">
+            class="card p-4 capture-card mb-3">
 
             @csrf
 
@@ -377,11 +284,10 @@
             </p>
         </form>
 
-        <!-- Instructions Card -->
         <div class="instructions-card">
             <h3>
                 <i class="bi bi-info-circle-fill"></i>
-                🎯 Requisitos importantes
+                Requisitos importantes
             </h3>
             <p class="text-muted small mb-3">Asegúrate de que en la foto se vea claramente:</p>
             <ul class="requirements-list">
@@ -404,11 +310,10 @@
             </ul>
         </div>
 
-        <!-- Example Section -->
         <div class="example-section">
             <h4>
                 <i class="bi bi-image"></i>
-                📷 Ejemplo de factura
+                Ejemplo de factura
             </h4>
             <div class="example-image-container">
                 <span class="example-badge">EJEMPLO</span>
@@ -427,26 +332,6 @@
     </div>
 
     <script>
-        // Efecto de nieve
-        function createSnowflake() {
-            const snowflake = document.createElement('div');
-            snowflake.className = 'snowflake';
-            snowflake.innerHTML = '❄';
-            snowflake.style.left = Math.random() * 100 + '%';
-            snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            snowflake.style.opacity = Math.random();
-            snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-            document.getElementById('snowflakes').appendChild(snowflake);
-
-            setTimeout(() => {
-                snowflake.remove();
-            }, 5000);
-        }
-
-        // Crear nieve continuamente
-        setInterval(createSnowflake, 300);
-
-        // Funcionalidad del formulario
         (function() {
             const fileInput = document.getElementById('invoice_image');
             const form = document.getElementById('captureForm');

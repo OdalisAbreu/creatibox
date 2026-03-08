@@ -43,6 +43,7 @@ class CaptureController extends Controller
     {
         try {
             $capture = Capture::where('cell_phone', $cell_phone)->latest()->first();
+            Log::info('capture', ['capture' => $capture]);
             
             if (!$capture) {
                 Log::warning('Intento de acceso a formulario con número no registrado: ' . $cell_phone);
