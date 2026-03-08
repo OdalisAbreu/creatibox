@@ -31,9 +31,15 @@ class DatabaseSeeder extends Seeder
             'wasapi_id' => '20349',
             'final_message' => '¡Listo! Tu factura ha sido recibida correctamente. ✅
 
-*¡Gracias por participar en Estrellas de la Navidad!* 🌟
+*
 
-Recuerda: mientras más facturas registres, más oportunidades tienes de ganar ese bar soñado para tu hogar. Promoción válida hasta el 10 de enero del 2026. Evite el exceso de alcohol. 
+¡Gracias por participar en Arma tu Combo y Gana!
+
+Recuerda: Mientras más compres, ¡más chances tienes de ganar!
+
+Promoción válida hasta el 3 de abril 2026.
+
+¡Mucha suerte!
 
 ¡Mucha suerte! 🍀
 ',

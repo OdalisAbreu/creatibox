@@ -102,7 +102,7 @@ class CaptureController extends Controller
             ]);
             
             $wasapiAccount = WasapiAccount::first();
-          $mensaje = $wasapiAccount->final_message;
+          $mensaje = 'Tu factura ha sido recibida correctamente ' + $capture->name + $wasapiAccount->final_message;
 //return $wasapiAccount->final_message;
             $wasapiService = new WasapiService();
             $wasapiService->sendText($capture->number_send_message ?? $capture->cell_phone, $mensaje);
