@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
 
 Recuerda: Mientras más compres, ¡más chances tienes de ganar!
 
-Promoción válida hasta el 3 de abril 2026.
+Promoción válida del 9 de Marzo al 10 de Abril 2026.
 
 ¡Mucha suerte!
 ',

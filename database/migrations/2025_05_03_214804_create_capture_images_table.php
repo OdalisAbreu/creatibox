@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('capture_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('capture_id')->constrained()->onDelete('cascade');
-            $table->string('image_path')->nullable();
+            $table->string('image_path')->nullable();            
+            $table->boolean('registered')->default(false);
             $table->timestamps();
         });
     }

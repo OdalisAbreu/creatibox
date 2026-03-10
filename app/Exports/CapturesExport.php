@@ -17,20 +17,20 @@ class CapturesExport implements FromCollection, WithHeadings
     }
     public function collection()
     {
-        $query = Capture::leftJoin('capture_images', 'captures.id', '=', 'capture_images.capture_id')
-            ->select(
-                'captures.id',
-                'captures.name',
-                'captures.card_id',
-                'captures.cell_phone',
-                'captures.contact_number',
-                'captures.city',
-                'captures.storage',
-                DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS completed_status"),
-                DB::raw("CONCAT('" . url('storage') . "/', capture_images.image_path) AS full_image_path"),
-                DB::raw("DATE_FORMAT(captures.created_at, '%d/%m/%Y') AS formatted_created_at"),
-                DB::raw("(SELECT GROUP_CONCAT(ticket_number ORDER BY id SEPARATOR ', ') FROM tikets WHERE tikets.capture_id = captures.id) AS tikets_asignados")
-            );
+        $storageUrl = addslashes(url('storage') . '/');
+        $query = Capture::select(
+            'captures.id',
+            'captures.name',
+            'captures.card_id',
+            'captures.cell_phone',
+            'captures.contact_number',
+            'captures.city',
+            'captures.storage',
+            DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS completed_status"),
+            DB::raw("(SELECT GROUP_CONCAT(CONCAT('" . $storageUrl . "', image_path) ORDER BY id SEPARATOR '; ') FROM capture_images WHERE capture_images.capture_id = captures.id) AS full_image_path"),
+            DB::raw("DATE_FORMAT(captures.created_at, '%d/%m/%Y') AS formatted_created_at"),
+            DB::raw("(SELECT COALESCE(SUM(CAST(ticket_number AS UNSIGNED)), 0) FROM tikets WHERE tikets.capture_id = captures.id) AS total_boletos")
+        );
 
         // Aplicar filtros
         if (!empty($this->filters['name'])) {
@@ -39,6 +39,10 @@ class CapturesExport implements FromCollection, WithHeadings
 
         if (!empty($this->filters['cell_phone'])) {
             $query->where('captures.cell_phone', 'like', '%' . $this->filters['cell_phone'] . '%');
+        }
+
+        if (!empty($this->filters['card_id'])) {
+            $query->where('captures.card_id', 'like', '%' . $this->filters['card_id'] . '%');
         }
 
         if (!empty($this->filters['start_date'])) {
@@ -65,7 +69,7 @@ class CapturesExport implements FromCollection, WithHeadings
             'Estado',
             'Factura',
             'Fecha Registro',
-            'Tikets asignados'
+            'Total de boletos'
         ];
     }
 }

@@ -45,34 +45,35 @@
         </div>
 
         <!-- Filtros generales -->
-        <form method="GET" class="d-flex align-items-center mb-4">
-            <div class="me-2">
-                <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Nombre">
-            </div>
-            <div class="me-2">
-                <input type="text" name="cell_phone" value="{{ request('cell_phone') }}" class="form-control" placeholder="Celular">
-            </div>
-            <div class="me-2">
-                <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" placeholder="Fecha inicio">
-            </div>
-            <div class="me-2">
-                <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" placeholder="Fecha fin">
-            </div>
-            <div class="me-3" style="min-width: 150px;">
-                <select name="status" class="form-control">
-                    <option value="">Estados</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completados</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendientes</option>
-                </select>
-            </div>
-            <div class="me-2">
-                <button type="submit" class="btn btn-primary me-2">🔍 Filtrar</button>
-            </div>
-            <div class="me-2">
-                <a href="{{ url('/admin') }}" class="btn btn-secondary">🧹 Limpiar</a>
-            </div>
-            <div>
-                <button type="button" class="btn btn-info" onclick="location.reload();">🔄 Actualizar</button>
+        <form method="GET" class="mb-4">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <div>
+                    <input type="text" name="name" value="{{ request('name') }}" class="form-control" placeholder="Nombre">
+                </div>
+                <div>
+                    <input type="text" name="cell_phone" value="{{ request('cell_phone') }}" class="form-control" placeholder="Celular">
+                </div>
+                <div>
+                    <input type="text" name="card_id" value="{{ request('card_id') }}" class="form-control" placeholder="Cédula">
+                </div>
+                <div>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" placeholder="Fecha inicio">
+                </div>
+                <div>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" placeholder="Fecha fin">
+                </div>
+                <div style="min-width: 150px;">
+                    <select name="status" class="form-control">
+                        <option value="">Estados</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completados</option>
+                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendientes</option>
+                    </select>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+                    <a href="{{ url('/admin') }}" class="btn btn-secondary">🧹 Limpiar</a>
+                    <button type="button" class="btn btn-info" onclick="location.reload();">🔄 Actualizar</button>
+                </div>
             </div>
         </form>
 
@@ -87,6 +88,7 @@
                         <th>Num. Contacto</th>
                         <th>Estado</th>
                         <th>Factura</th>
+                        <th>Completado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -115,6 +117,20 @@
                                 data-image="{{ Storage::url($capture->image_path) }}">
                             @else
                             <span class="text-muted">Sin imagen</span>
+                            @endif
+                        </td>
+                        <td class="align-middle text-center">
+                            @if ($capture->image_id)
+                            <form class="registered-form d-inline-block mb-0" action="{{ route('admin.toggleCaptureImageRegistered', ['id' => $capture->image_id]) }}" method="POST" data-registered="{{ $capture->image_registered ? '1' : '0' }}">
+                                @csrf
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input registered-switch" type="checkbox" role="switch"
+                                        {{ $capture->image_registered ? 'checked' : '' }}
+                                        title="Registro confirmado correcto">
+                                </div>
+                            </form>
+                            @else
+                            <span class="text-muted">—</span>
                             @endif
                         </td>
                         <td>
@@ -373,14 +389,14 @@
                             <input type="text" class="form-control" id="edit_storage" name="storage" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Asignar Tikets</label>
+                            <label class="form-label">Asignar Boletos</label>
                             <div id="tiketsContainer">
                                 <div class="input-group mb-2 tikets-row">
-                                    <input type="text" class="form-control" name="tikets[]" placeholder="Tk">
+                                    <input type="text" class="form-control" name="tikets[]" placeholder="Boletos">
                                     <button type="button" class="btn btn-outline-danger btn-remove-tk" title="Eliminar Tk" aria-label="Eliminar">×</button>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTiket" title="Agregar otro Tk">+ Agregar Tk</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTiket" title="Agregar otro Tk">+ Agregar Boletos</button>
                         </div>
                     </div>
 
@@ -451,11 +467,40 @@
                 });
             });
 
+            // Switch "Completado" (registered) en capture_images
+            document.addEventListener('change', function(e) {
+                const sw = e.target.closest('.registered-switch');
+                if (!sw) return;
+                const form = sw.closest('.registered-form');
+                if (!form) return;
+                e.preventDefault();
+                const url = form.getAttribute('action');
+                const checked = sw.checked;
+                const formData = new FormData(form);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: formData,
+                })
+                .then(r => {
+                    if (!r.ok) throw new Error('Error ' + r.status);
+                    return r.json();
+                })
+                .then(data => {
+                    if (data.success) sw.checked = !!data.registered;
+                    else sw.checked = !checked;
+                })
+                .catch(function() { sw.checked = !checked; });
+            });
+
             // Helper: construir filas de Tikets para el modal de edición
             function buildTiketsRows(tiketsArray) {
                 const rowHtml = (value) => `
                     <div class="input-group mb-2 tikets-row">
-                        <input type="text" class="form-control" name="tikets[]" placeholder="Tk" value="${(value || '').replace(/"/g, '&quot;').replace(/</g, '&lt;')}">
+                        <input type="text" class="form-control" name="tikets[]" placeholder="Boletos" value="${(value || '').replace(/"/g, '&quot;').replace(/</g, '&lt;')}">
                         <button type="button" class="btn btn-outline-danger btn-remove-tk" title="Eliminar Tk">×</button>
                     </div>`;
                 if (!Array.isArray(tiketsArray) || tiketsArray.length === 0) {
@@ -537,11 +582,11 @@
                                     <input type="text" class="form-control" id="edit_storage" name="storage" value="${data.storage}" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Asignar Tikets</label>
+                                    <label class="form-label">Asignar Boletos</label>
                                     <div id="tiketsContainer">
                                         ${buildTiketsRows(data.tikets_array)}
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTiket" title="Agregar otro Tk">+ Agregar Tk</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddTiket" title="Agregar otro Tk">+ Agregar Boletos</button>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

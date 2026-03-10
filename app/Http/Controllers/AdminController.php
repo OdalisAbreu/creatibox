@@ -24,6 +24,7 @@ class AdminController extends Controller
                 'captures.*',
                 'capture_images.image_path',
                 'capture_images.id AS image_id',
+                'capture_images.registered AS image_registered',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado")
             );
 
@@ -34,6 +35,10 @@ class AdminController extends Controller
 
         if ($request->filled('cell_phone')) {
             $query->where('captures.cell_phone', 'like', '%' . $request->cell_phone . '%');
+        }
+
+        if ($request->filled('card_id')) {
+            $query->where('captures.card_id', 'like', '%' . $request->card_id . '%');
         }
 
         if ($request->filled('start_date')) {
@@ -53,7 +58,7 @@ class AdminController extends Controller
         }
 
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
+        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('card_id') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -95,7 +100,7 @@ class AdminController extends Controller
                 'captures.created_at',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
-                DB::raw("(SELECT GROUP_CONCAT(ticket_number ORDER BY id SEPARATOR ', ') FROM tikets WHERE tikets.capture_id = captures.id) AS tikets_asignados")
+                DB::raw("(SELECT COALESCE(SUM(CAST(ticket_number AS UNSIGNED)), 0) FROM tikets WHERE tikets.capture_id = captures.id) AS total_boletos")
             );
 
         // Aplicar filtros
@@ -105,6 +110,10 @@ class AdminController extends Controller
 
         if ($request->filled('cell_phone')) {
             $query->where('captures.cell_phone', 'like', '%' . $request->cell_phone . '%');
+        }
+
+        if ($request->filled('card_id')) {
+            $query->where('captures.card_id', 'like', '%' . $request->card_id . '%');
         }
 
         if ($request->filled('start_date')) {
@@ -124,7 +133,7 @@ class AdminController extends Controller
         }
 
         // Si no hay filtros, traer los registros de los últimos 3 días
-        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
+        if (!$request->filled('name') && !$request->filled('cell_phone') && !$request->filled('card_id') && !$request->filled('start_date') && !$request->filled('end_date') && !$request->filled('status')) {
             $query->whereDate('captures.created_at', '>=', now()->subDays(3));
         }
 
@@ -153,6 +162,17 @@ class AdminController extends Controller
         return redirect()->route('dashboard')->with('success', 'Capture deleted successfully.');
     }
 
+    public function toggleCaptureImageRegistered($id)
+    {
+        $captureImage = CaptureImage::findOrFail($id);
+        $captureImage->registered = !$captureImage->registered;
+        $captureImage->save();
+        return response()->json([
+            'success' => true,
+            'registered' => $captureImage->registered,
+        ]);
+    }
+
     public function previewPdf()
     {
         // Usa la MISMA consulta que exportPdf()
@@ -169,7 +189,7 @@ class AdminController extends Controller
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
                 'capture_images.created_at AS invoice_created_at',
-                DB::raw("(SELECT GROUP_CONCAT(ticket_number ORDER BY id SEPARATOR ', ') FROM tikets WHERE tikets.capture_id = captures.id) AS tikets_asignados")
+                DB::raw("(SELECT COALESCE(SUM(CAST(ticket_number AS UNSIGNED)), 0) FROM tikets WHERE tikets.capture_id = captures.id) AS total_boletos")
             )
             ->latest('captures.created_at')
             ->limit(50)            //  ≤50 para que cargue rápido en pantalla

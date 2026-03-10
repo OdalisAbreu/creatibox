@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/export/pdf', [AdminController::class, 'exportPdf']);
 
     Route::delete('/admin/delete/{id}', [AdminController::class, 'deleteCapture'])->name('admin.deleteCapture');
+    Route::match(['PATCH', 'POST'], '/admin/capture-image/{id}/registered', [AdminController::class, 'toggleCaptureImageRegistered'])->name('admin.toggleCaptureImageRegistered');
     Route::post('/admin/upload-image', [AdminController::class, 'uploadImage'])->name('admin.uploadImage');
     Route::post('/admin/store-capture', [AdminController::class, 'storeCapture'])->name('admin.storeCapture');
     Route::get('/admin/edit/{id}', [AdminController::class, 'editCapture'])->name('admin.editCapture');

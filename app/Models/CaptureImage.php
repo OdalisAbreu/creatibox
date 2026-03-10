@@ -11,7 +11,13 @@ class CaptureImage extends Model
     protected $fillable = [
         'capture_id',
         'image_path',
+        'registered',
     ];
+
+    protected $casts = [
+        'registered' => 'boolean',
+    ];
+
     public function capture()
     {
         return $this->belongsTo(Capture::class);
