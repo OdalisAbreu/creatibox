@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-Route::get('          ', [CustomerController::class, 'create'])->name('customers.form');
+Route::get('/customer/form', [CustomerController::class, 'create'])->name('customers.form');
 Route::post('/customer/form', [CustomerController::class, 'store'])->name('customers.store');
 
 Route::get('/capture/{cell_phone}', [CaptureController::class, 'showForm'])
