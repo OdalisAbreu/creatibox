@@ -30,7 +30,7 @@ class CustomerController extends Controller
             'gender' => ['required', 'in:F,M'],
             'instagram' => ['nullable', 'string', 'max:100'],
             'tiktok' => ['nullable', 'string', 'max:100'],
-            'occupations' => ['required', 'array'],
+            'occupations' => ['required', 'array', 'min:1', 'max:2'],
             'occupations.*' => ['integer', 'exists:occupations,id'],
             'occupation_other' => ['nullable', 'string', 'max:255'],
             'interests' => ['nullable', 'array'],
@@ -39,6 +39,7 @@ class CustomerController extends Controller
             'phone.regex' => 'El teléfono debe contener solo números, sin espacios.',
             'email.email' => 'Debe ingresar un correo electrónico válido.',
             'occupation_other.required_if' => 'Debe especificar la ocupación cuando selecciona Otro.',
+            'occupations.max' => 'Solo puede seleccionar como máximo 2 ocupaciones.',
         ]);
 
         $validated['country'] = $request->input('country', '');

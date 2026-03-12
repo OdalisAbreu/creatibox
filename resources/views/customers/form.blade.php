@@ -228,18 +228,19 @@
                         </select>
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Ocupación laboral (puede elegir varias) <span class="text-danger">*</span></label>
-                        <p class="small text-muted mb-2">Seleccione todas las que apliquen.</p>
+                        <label class="form-label">Ocupación laboral (máximo 2) <span class="text-danger">*</span></label>
+                        <p class="small text-muted mb-2">Seleccione como máximo dos opciones. <span id="occupation-count" class="text-primary"></span></p>
                         <div class="row g-2">
                             @foreach ($occupations as $occupation)
                                 <div class="col-12 col-sm-6 col-md-4">
                                     <div class="form-check">
                                         <input
-                                            class="form-check-input"
+                                            class="form-check-input occupation-checkbox"
                                             type="checkbox"
                                             name="occupations[]"
                                             value="{{ $occupation->id }}"
                                             id="occ_{{ $occupation->id }}"
+                                            data-max-occupations="2"
                                             {{ in_array((string) $occupation->id, old('occupations', [])) ? 'checked' : '' }}
                                         >
                                         <label class="form-check-label small" for="occ_{{ $occupation->id }}">
@@ -296,8 +297,30 @@
                     this.value = this.value.replace(/\D/g, '');
                 });
             }
-            // Ya no es necesario mostrar/ocultar ocupación "Otro" según selección;
-            // el campo de texto para otros siempre está disponible de forma opcional.
+
+            // Máximo 2 ocupaciones
+            var MAX_OCCUPATIONS = 2;
+            var occupationCheckboxes = document.querySelectorAll('.occupation-checkbox');
+            var countEl = document.getElementById('occupation-count');
+
+            function updateOccupationCount() {
+                var checked = document.querySelectorAll('.occupation-checkbox:checked');
+                var n = checked.length;
+                countEl.textContent = n ? '(' + n + ' de ' + MAX_OCCUPATIONS + ' seleccionadas)' : '';
+            }
+
+            if (occupationCheckboxes.length && countEl) {
+                occupationCheckboxes.forEach(function (cb) {
+                    cb.addEventListener('change', function () {
+                        var checked = document.querySelectorAll('.occupation-checkbox:checked');
+                        if (checked.length > MAX_OCCUPATIONS) {
+                            this.checked = false;
+                        }
+                        updateOccupationCount();
+                    });
+                });
+                updateOccupationCount();
+            }
         })();
     </script>
 </body>
