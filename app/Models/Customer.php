@@ -20,7 +20,6 @@ class Customer extends Model
         'gender',
         'instagram',
         'tiktok',
-        'occupation',
         'occupation_other',
         'country',
     ];
@@ -28,6 +27,11 @@ class Customer extends Model
     public function interests()
     {
         return $this->belongsToMany(Interest::class, 'customer_interest');
+    }
+
+    public function occupations()
+    {
+        return $this->belongsToMany(Occupation::class, 'customer_occupation');
     }
 
     public const AGE_RANGES = [
@@ -44,31 +48,4 @@ class Customer extends Model
         'M' => 'Masculino',
     ];
 
-    public const OCCUPATIONS = [
-        'Arquitectura',
-        'Diseño de Interiores',
-        'Diseño Gráfico',
-        'Moda',
-        'Fotografía',
-        'Cine / Audiovisual',
-        'Arte / Artista Plástico',
-        'Música / DJ / Producción Musical',
-        'Periodista / Prensa',
-        'Creador de Contenido/ Influencers',
-        'Publicidad / Analista / Marketing',
-        'Evento',
-        'Sector Financiero / Banca',
-        'Chef / Gastronomía',
-        'Bares y Restaurantes / Mixología',
-        'Belleza / Estética',
-        'Fitness / Wellness',
-        'Dermatología',
-        'Medicina',
-        'Retail Lujo',
-        'Sector Público',
-        'Bienes Raíces',
-        'Estudiante',
-        'Deportista',
-        'Otro',
-    ];
 }

@@ -132,7 +132,7 @@
     <div class="container form-card">
         <header class="maeno-header">
             <a href="{{ url('/customer/form') }}">
-                <img src="{{ asset('images/logo-maeno.png') }}" alt="Maeno&amp;Co" class="logo">
+                <img src="{{ asset('images/LOGOS-5.png') }}" alt="Maeno&amp;Co" class="logo">
             </a>
         </header>
 
@@ -228,17 +228,39 @@
                         </select>
                     </div>
                     <div class="col-12">
-                        <label for="occupation" class="form-label">Ocupación laboral <span class="text-danger">*</span></label>
-                        <select class="form-select" id="occupation" name="occupation" required>
-                            <option value="">Seleccione...</option>
-                            @foreach (\App\Models\Customer::OCCUPATIONS as $opt)
-                                <option value="{{ $opt }}" {{ old('occupation') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                        <label class="form-label">Ocupación laboral (puede elegir varias) <span class="text-danger">*</span></label>
+                        <p class="small text-muted mb-2">Seleccione todas las que apliquen.</p>
+                        <div class="row g-2">
+                            @foreach ($occupations as $occupation)
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="occupations[]"
+                                            value="{{ $occupation->id }}"
+                                            id="occ_{{ $occupation->id }}"
+                                            {{ in_array((string) $occupation->id, old('occupations', [])) ? 'checked' : '' }}
+                                        >
+                                        <label class="form-check-label small" for="occ_{{ $occupation->id }}">
+                                            {{ $occupation->name }}
+                                        </label>
+                                    </div>
+                                </div>
                             @endforeach
-                        </select>
+                        </div>
                     </div>
-                    <div class="col-12" id="wrap_occupation_other" style="{{ old('occupation') === 'Otro' ? '' : 'display:none;' }}">
-                        <label for="occupation_other" class="form-label">Especifique ocupación (Otro)</label>
-                        <input type="text" class="form-control" id="occupation_other" name="occupation_other" value="{{ old('occupation_other') }}" maxlength="255" placeholder="Indique su ocupación">
+                    <div class="col-12">
+                        <label for="occupation_other" class="form-label">Otros (especifique)</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="occupation_other"
+                            name="occupation_other"
+                            value="{{ old('occupation_other') }}"
+                            maxlength="255"
+                            placeholder="Indique otra ocupación, si aplica"
+                        >
                     </div>
                 </div>
             </div>
@@ -274,14 +296,8 @@
                     this.value = this.value.replace(/\D/g, '');
                 });
             }
-            var occupation = document.getElementById('occupation');
-            var wrapOther = document.getElementById('wrap_occupation_other');
-            if (occupation && wrapOther) {
-                occupation.addEventListener('change', function () {
-                    wrapOther.style.display = this.value === 'Otro' ? 'block' : 'none';
-                    document.getElementById('occupation_other').required = this.value === 'Otro';
-                });
-            }
+            // Ya no es necesario mostrar/ocultar ocupación "Otro" según selección;
+            // el campo de texto para otros siempre está disponible de forma opcional.
         })();
     </script>
 </body>

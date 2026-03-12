@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Interest;
+use App\Models\Occupation;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -11,7 +12,9 @@ class CustomerController extends Controller
     public function create()
     {
         $interests = Interest::orderBy('name')->get();
-        return view('customers.form', compact('interests'));
+        $occupations = Occupation::orderBy('name')->get();
+
+        return view('customers.form', compact('interests', 'occupations'));
     }
 
     public function store(Request $request)
@@ -27,8 +30,9 @@ class CustomerController extends Controller
             'gender' => ['required', 'in:F,M'],
             'instagram' => ['nullable', 'string', 'max:100'],
             'tiktok' => ['nullable', 'string', 'max:100'],
-            'occupation' => ['required', 'string', 'max:255'],
-            'occupation_other' => ['required_if:occupation,Otro', 'nullable', 'string', 'max:255'],
+            'occupations' => ['required', 'array'],
+            'occupations.*' => ['integer', 'exists:occupations,id'],
+            'occupation_other' => ['nullable', 'string', 'max:255'],
             'interests' => ['nullable', 'array'],
             'interests.*' => ['integer', 'exists:interests,id'],
         ], [
@@ -43,10 +47,13 @@ class CustomerController extends Controller
         $validated['age_range'] = $request->input('age_range');
 
         $interestIds = array_map('intval', $validated['interests'] ?? []);
-        unset($validated['interests']);
+        $occupationIds = array_map('intval', $validated['occupations'] ?? []);
+
+        unset($validated['interests'], $validated['occupations']);
 
         $customer = Customer::create($validated);
         $customer->interests()->sync($interestIds);
+        $customer->occupations()->sync($occupationIds);
 
         return redirect()->route('customers.form')->with('success', 'Registro guardado correctamente.');
     }
