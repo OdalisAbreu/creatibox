@@ -150,7 +150,7 @@
 
                                 <!-- Botón de eliminar -->
                                 @if ($capture->image_id)
-                                <button type="button"
+                              <!--  <button type="button"
                                     class="btn btn-danger d-flex justify-content-center align-items-center delete-btn"
                                     data-bs-toggle="modal"
                                     data-bs-target="#deleteModal"
@@ -161,7 +161,7 @@
                                     data-bs-placement="top"
                                     title="Solo eliminará la factura">
                                     <i class="fas fa-trash-alt" style="font-size: 1.5rem;"></i>
-                                </button>
+                                </button> -->
                                 @endif
 
                                 <!-- Botón de subir imagen -->
