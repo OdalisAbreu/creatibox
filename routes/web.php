@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CaptureController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
@@ -30,6 +31,9 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+Route::get('          ', [CustomerController::class, 'create'])->name('customers.form');
+Route::post('/customer/form', [CustomerController::class, 'store'])->name('customers.store');
 
 Route::get('/capture/{cell_phone}', [CaptureController::class, 'showForm'])
     ->name('capture.form');
