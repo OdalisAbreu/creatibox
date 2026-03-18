@@ -582,6 +582,22 @@
                                     <input type="text" class="form-control" id="edit_storage" name="storage" value="${data.storage}" required>
                                 </div>
                                 <div class="mb-3">
+                                    <label for="edit_rejected_reason" class="form-label">Motivo Rechazo</label>
+                                    <select class="form-control" id="edit_rejected_reason" name="rejected_reason">
+                                        <option value="">Seleccione...</option>
+                                        <option value="No cumple con monto mínimo">No cumple con monto mínimo</option>
+                                        <option value="Comercio no válido">Comercio no válido</option>
+                                        <option value="No tiene productos participantes">No tiene productos participantes</option>
+                                        <option value="Fecha no válida">Fecha no válida</option>
+                                        <option value="Factura Duplicada">Factura Duplicada</option>
+                                    </select>
+                                </div>
+
+                                <div id="edit_comment_wrapper" class="mb-3" style="display: none;">
+                                    <label for="edit_comment" class="form-label">Comentario</label>
+                                    <textarea class="form-control" id="edit_comment" name="comment" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Asignar Boletos</label>
                                     <div id="tiketsContainer">
                                         ${buildTiketsRows(data.tikets_array)}
@@ -593,6 +609,24 @@
                                     <button type="button" class="btn btn-primary" onclick="submitEditForm('${captureId}')">Actualizar</button>
                                 </div>
                             `;
+
+                            // Hacer que el textarea de comentario solo aparezca cuando hay un motivo seleccionado
+                            const rejectedReasonSelect = modalBody.querySelector('#edit_rejected_reason');
+                            const editCommentWrapper = modalBody.querySelector('#edit_comment_wrapper');
+                            const editComment = modalBody.querySelector('#edit_comment');
+
+                            const toggleCommentVisibility = () => {
+                                const show = rejectedReasonSelect && rejectedReasonSelect.value !== '';
+                                if (editCommentWrapper) editCommentWrapper.style.display = show ? 'block' : 'none';
+                                if (!show && editComment) editComment.value = '';
+                            };
+
+                            if (rejectedReasonSelect) {
+                                if (editComment) editComment.value = data.comment || '';
+                                rejectedReasonSelect.value = data.rejected_reason || '';
+                                toggleCommentVisibility();
+                                rejectedReasonSelect.addEventListener('change', toggleCommentVisibility);
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -720,12 +754,20 @@
             const formData = new FormData();
             
             // Recopilar datos del modal
-            const inputs = modal.querySelectorAll('input');
-            inputs.forEach(input => {
-                if (input.name && input.value) {
-                    formData.append(input.name, input.value);
-                    console.log('Agregando campo:', input.name, '=', input.value);
+            const fields = modal.querySelectorAll('input[name], select[name], textarea[name]');
+            fields.forEach(field => {
+                if (!field.name) return;
+
+                // Guardamos tickets solo si vienen con valor
+                if (field.name === 'tikets[]') {
+                    const v = (field.value || '').trim();
+                    if (v) formData.append(field.name, v);
+                    return;
                 }
+
+                // Para permitir limpiar valores (ej. al poner "Seleccione..."), incluimos también vacíos
+                formData.append(field.name, field.value ?? '');
+                console.log('Agregando campo:', field.name, '=', field.value);
             });
             
             // Agregar CSRF token

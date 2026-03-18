@@ -96,6 +96,8 @@ class AdminController extends Controller
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
+                'captures.rejected_reason',
+                'captures.comment',
                 'captures.completed',
                 'captures.created_at',
                 'capture_images.image_path',
@@ -185,6 +187,8 @@ class AdminController extends Controller
                 'captures.city',
                 'captures.storage',
                 'captures.card_id',
+                'captures.rejected_reason',
+                'captures.comment',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
@@ -297,6 +301,9 @@ public function updateCapture(Request $request, $id)
         $card_id = preg_replace('/\D/', '', $card_id);
 
         // Preparar datos para actualizar
+        $rejectedReason = $request->filled('rejected_reason') ? trim($request->input('rejected_reason')) : null;
+        $comment = $request->filled('comment') ? trim($request->input('comment')) : null;
+
         $updateData = [
             'name' => $request->name ?? '',
             'cell_phone' => $request->cell_phone,
@@ -304,6 +311,8 @@ public function updateCapture(Request $request, $id)
             'city' => $request->city ?? '',
             'storage' => $request->storage ?? '',
             'card_id' => $card_id,
+            'rejected_reason' => $rejectedReason,
+            'comment' => $rejectedReason ? $comment : null,
         ];
         
         // Log para debug

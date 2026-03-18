@@ -80,6 +80,8 @@
                 <th>Ciudad</th>
                 <th>Establecimiento</th>
                 <th>Fecha Registro</th>
+                <th>Motivo Rechazo</th>
+                <th>Comentario</th>
                 <th>Imagen</th>
                 <th>Total de boletos</th>
             </tr>
@@ -94,6 +96,8 @@
                 <td>{{ $capture->city }}</td>
                 <td>{{ $capture->storage }}</td>
                 <td> {{ $capture->created_at->format('d/m/Y') }}</td>
+                <td>{{ $capture->rejected_reason ?? '' }}</td>
+                <td style="word-wrap: break-word; white-space: pre-wrap;">{{ $capture->comment ?? '' }}</td>
                 <td>
                     @php
                         $path = $capture->image_path;

@@ -29,6 +29,8 @@ class CapturesExport implements FromCollection, WithHeadings
             DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS completed_status"),
             DB::raw("(SELECT GROUP_CONCAT(CONCAT('" . $storageUrl . "', image_path) ORDER BY id SEPARATOR '; ') FROM capture_images WHERE capture_images.capture_id = captures.id) AS full_image_path"),
             DB::raw("DATE_FORMAT(captures.created_at, '%d/%m/%Y') AS formatted_created_at"),
+            'captures.rejected_reason',
+            'captures.comment',
             DB::raw("(SELECT COALESCE(SUM(CAST(ticket_number AS UNSIGNED)), 0) FROM tikets WHERE tikets.capture_id = captures.id) AS total_boletos")
         );
 
@@ -69,6 +71,8 @@ class CapturesExport implements FromCollection, WithHeadings
             'Estado',
             'Factura',
             'Fecha Registro',
+            'Motivo Rechazo',
+            'Comentario',
             'Total de boletos'
         ];
     }
