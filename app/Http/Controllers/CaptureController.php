@@ -79,7 +79,7 @@ class CaptureController extends Controller
         try {
             // Validar que se envíe una imagen
             $request->validate([
-                'invoice_image' => 'required|image|max:5072' // 3MB máximo
+                'invoice_image' => 'required|image|max:10240' // 10MB máximo
             ]);
 
             $capture = Capture::where('cell_phone', $cell_phone)->latest()->first();
