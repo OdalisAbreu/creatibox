@@ -83,9 +83,7 @@
                     <tr>
                         <th>No.</th>
                         <th>Nombre</th>
-                        <th>Género</th>
                         <th>Card ID</th>
-                        <th>Pasaporte</th>
                         <th>Num. Contacto</th>
                         <th>Estado</th>
                         <th>Factura</th>
@@ -97,9 +95,7 @@
                     <tr>
                         <td><a href="/capture/{{ $capture->cell_phone }}" title="{{ $capture->id }}" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;">{{ Str::limit($capture->id, 20) }}</a></td>
                         <td title="{{ $capture->name }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->name, 15) }}</td>
-                        <td title="{{ $capture->gender }}" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Str::limit($capture->gender, 15) }}</td>
                         <td>{{ $capture->card_id }}</td>
-                        <td>{{ $capture->passport ?? '-' }}</td>
                         <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
                         <td>
                             @if ($capture->completed)
@@ -291,29 +287,9 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="gender" class="form-label">Género</label>
-                            <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" required>
-                                <option value="">Seleccionar género</option>
-                                <option value="Masculino" {{ old('gender') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                                <option value="Femenino" {{ old('gender') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                                <option value="Otro" {{ old('gender') == 'Otro' ? 'selected' : '' }}>Otro</option>
-                            </select>
-                            @error('gender')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
                             <label for="card_id" class="form-label">Cédula</label>
                             <input type="text" class="form-control @error('card_id') is-invalid @enderror" id="card_id" name="card_id" value="{{ old('card_id') }}" required>
                             @error('card_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="passport" class="form-label">Pasaporte</label>
-                            <input type="text" class="form-control @error('passport') is-invalid @enderror" id="passport" name="passport" value="{{ old('passport') }}">
-                            @error('passport')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -388,21 +364,8 @@
                             <input type="text" class="form-control" id="edit_name" name="name" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit_gender" class="form-label">Género</label>
-                            <select class="form-control" id="edit_gender" name="gender" required>
-                                <option value="">Seleccionar género</option>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
                             <label for="edit_card_id" class="form-label">Cédula</label>
                             <input type="text" class="form-control" id="edit_card_id" name="card_id" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_passport" class="form-label">Pasaporte</label>
-                            <input type="text" class="form-control" id="edit_passport" name="passport">
                         </div>
                         <div class="mb-3">
                             <label for="cell_phone" class="form-label">Celular</label>
@@ -527,21 +490,8 @@
                                     <input type="text" class="form-control" id="edit_name" name="name" value="${data.name}" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="edit_gender" class="form-label">Género</label>
-                                    <select class="form-control" id="edit_gender" name="gender" required>
-                                        <option value="">Seleccionar género</option>
-                                        <option value="Masculino" ${data.gender === 'Masculino' ? 'selected' : ''}>Masculino</option>
-                                        <option value="Femenino" ${data.gender === 'Femenino' ? 'selected' : ''}>Femenino</option>
-                                        <option value="Otro" ${data.gender === 'Otro' ? 'selected' : ''}>Otro</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
                                     <label for="edit_card_id" class="form-label">Cédula</label>
                                     <input type="text" class="form-control" id="edit_card_id" name="card_id" value="${data.card_id}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_passport" class="form-label">Passport</label>
-                                    <input type="text" class="form-control" id="edit_passport" name="passport" value="${data.passport || ''}">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit_cell_phone" class="form-label">Celular</label>

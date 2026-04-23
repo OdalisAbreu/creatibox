@@ -30,7 +30,6 @@ class CaptureController extends Controller
         Capture::create([
             'cell_phone' => $phone ?? $cell_phone,
             'name' => $request->name,
-            'gender' => $request->gender ?? '',
        //     'invoice_number' => $request->invoice_number,
             'contact_number' => $request->contact_number ?? $cell_phone,
             'city' => $request->city ?? '',
@@ -38,7 +37,6 @@ class CaptureController extends Controller
             'card_id' => $card_id,
             'completed' => false,
             'number_send_message' => $cell_phone,
-            'passport' => $request->passport ?? '',
         ]);
     }
 

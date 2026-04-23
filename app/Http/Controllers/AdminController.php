@@ -86,13 +86,11 @@ class AdminController extends Controller
                 'captures.id',
              //   'captures.invoice_number',
                 'captures.name',
-                'captures.gender',
                 'captures.card_id',
                 'captures.cell_phone',
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
-                'captures.passport',
                 'captures.completed',
                 'captures.created_at',
                 'capture_images.image_path',
@@ -162,12 +160,10 @@ class AdminController extends Controller
                 'captures.id',
                 'captures.name',
                 'captures.cell_phone',
-                'captures.gender',
                 'captures.contact_number',
                 'captures.city',
                 'captures.storage',
                 'captures.card_id',
-                'captures.passport',
                 'capture_images.image_path',
                 DB::raw("CASE WHEN captures.completed = 1 THEN 'Completo' ELSE 'Pendiente' END AS estado"),
                 'captures.created_at',
@@ -212,14 +208,12 @@ class AdminController extends Controller
             $capture = Capture::create([
                 'cell_phone' => $request->cell_phone,
                 'name' => $request->name,
-                'gender' => $request->gender ?? '',
              //   'invoice_number' => $request->invoice_number,
                 'contact_number' => $request->contact_number ?? $request->cell_phone,
                 'city' => $request->city ?? '',
                 'storage' => $request->storage ?? '',
                 'card_id' => $card_id,
                 'completed' => true,
-                'passport' => $request->passport ?? '',
             ]);
 
             // Guardar la imagen en el almacenamiento
@@ -240,20 +234,20 @@ class AdminController extends Controller
         }
         throw $e;
     }
-}
+    }
 
-public function editCapture($id)
-{
-    $capture = Capture::findOrFail($id);
-    return response()->json($capture);
-}
-
-public function updateCapture(Request $request, $id)
-{
-    Log::info('Método updateCapture llamado con ID:', ['id' => $id]);
-    
-    try {
+    public function editCapture($id)
+    {
         $capture = Capture::findOrFail($id);
+        return response()->json($capture);
+    }
+
+    public function updateCapture(Request $request, $id)
+    {
+        Log::info('Método updateCapture llamado con ID:', ['id' => $id]);
+
+        try {
+            $capture = Capture::findOrFail($id);
         
         // Validar campos requeridos
         if (!$request->filled('cell_phone')) {
@@ -282,14 +276,12 @@ public function updateCapture(Request $request, $id)
         // Preparar datos para actualizar
         $updateData = [
             'name' => $request->name ?? '',
-            'gender' => $request->gender ?? '',
            // 'invoice_number' => $request->invoice_number ?? '',
             'cell_phone' => $request->cell_phone,
             'contact_number' => $request->contact_number ?? '',
             'city' => $request->city ?? '',
             'storage' => $request->storage ?? '',
             'card_id' => $card_id,
-            'passport' => $request->passport ?? '',
         ];
         
         // Log para debug

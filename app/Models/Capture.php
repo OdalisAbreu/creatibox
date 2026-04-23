@@ -11,7 +11,6 @@ class Capture extends Model
     protected $fillable = [
         'cell_phone',
         'name',
-        'gender',
         'city',
         'storage',
       //  'invoice_number',
@@ -19,7 +18,6 @@ class Capture extends Model
         'card_id',
         'completed',
         'number_send_message',
-        'passport',
     ];
     public function images()
     {
