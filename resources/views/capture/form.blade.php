@@ -29,7 +29,7 @@
         /* 2. Card ocupa casi todo el ancho en móviles */
         .capture-card {
             width: 90vw;
-            max-width: 420px;
+            max-width: 460px;
             margin: 0 auto;
             border-radius: 1rem;
             border: 0;
@@ -84,6 +84,34 @@
             display: flex;
         }
 
+        .guide-instructivo {
+            font-size: 0.9rem;
+            line-height: 1.45;
+            color: #333;
+            text-align: left;
+        }
+
+        .guide-instructivo .guide-lead {
+            color: var(--fc-blue);
+            font-weight: 600;
+        }
+
+        .guide-example-wrap {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .guide-example-wrap img {
+            display: block;
+            width: 100%;
+            max-height: 220px;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+
         @media (min-width: 768px) {
             .camera-label {
                 width: 200px;
@@ -98,11 +126,11 @@
 </head>
 
 <body>
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-2">
         <h2 class="fw-bold mb-3 text-center text-uppercase" style="color:var(--fc-blue)">
             Hola, {{ $capture->name }} 👋
         </h2>
-        <p class="text-center mb-4">Toma una foto o selecciona la imagen de tu factura</p>
+        <p class="text-center mb-3">Por favor, envíanos una foto clara de tu factura de compra.</p>
 
         @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
@@ -126,6 +154,8 @@
 
             @csrf
 
+            <div class="guide-instructivo mb-4">
+
             <div class="d-flex justify-content-center mb-3">
                 <label for="invoice_image" class="camera-label" title="Tomar foto / elegir imagen">
                     <i class="bi bi-camera-fill"></i>
@@ -140,7 +170,33 @@
 
             <p class="text-center small text-muted mb-0">
                 Formatos admitidos: JPG, PNG, HEIC … (máx. 3 MB)
-            </p>
+            </p><br>
+                <p class="mb-2">
+                    <span class="text-warning" aria-hidden="true">⚠️</span>
+                    <strong>Importante:</strong> Asegúrate de que se vea claramente:
+                </p>
+                <ul class="list-unstyled small ps-3 mb-3 mb-md-4">
+                    <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>El nombre del establecimiento.</li>
+                    <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>La fecha (dentro del período de vigencia).</li>
+                    <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>El monto total (mínimo RD$500).</li>
+                    <li class="mb-0"><span class="text-secondary me-2" aria-hidden="true">○</span>Los productos Induveca o marcas participantes (Caserío, Frank’s, Don Pedro, Santal, Yoka, Kraft, etc.).</li>
+                </ul>
+
+                @php
+                    $examplePath = public_path('storage/images/example.png');
+                @endphp
+                @if (file_exists($examplePath))
+                    <div class="guide-example-wrap text-center">
+                        <p class="small text-muted mb-2 mb-md-0 text-md-start">Guía visual — ejemplo</p>
+                        <img src="{{ asset('storage/images/example.png') }}"
+                            alt="Ejemplo de cómo tomar la foto de una factura válida"
+                            width="640"
+                            height="360"
+                            loading="lazy">
+                    </div>
+                @endif
+            </div>
+
         </form>
     </div>
 

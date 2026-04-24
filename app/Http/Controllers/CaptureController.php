@@ -42,10 +42,23 @@ class CaptureController extends Controller
 
     public function showForm($cell_phone)
     {
-        $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail()->load('images');
-        
-        // Si ya tiene una imagen, redirigir a la página de completado
+        $capture = Capture::where('cell_phone', $cell_phone)->latest()->first();
+
+        if (!$capture) {
+            $wasapiAccount = WasapiAccount::first();
+            $whatsappDigits = ($wasapiAccount && $wasapiAccount->phone)
+                ? preg_replace('/\D/', '', $wasapiAccount->phone)
+                : null;
+
+            return view('capture.not_registered', [
+                'cell_phone' => $cell_phone,
+                'whatsappDigits' => $whatsappDigits,
+            ]);
+        }
+
+        $capture->load('images');
         $wasapiAccount = WasapiAccount::first();
+
         return view('capture.form', compact('capture', 'wasapiAccount'));
     }
 

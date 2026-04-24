@@ -37,7 +37,7 @@ class WasapiService
         $payload = [
             'message' => $message,
             'wa_id'   => $waId,
-            'from_id' => $this->fromId,
+           // 'from_id' => $this->fromId,
         ];
 
         $response = Http::withToken($this->token)
