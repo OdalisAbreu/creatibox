@@ -15,14 +15,14 @@
 
     <style>
         :root {
-            --fc-green: #008037;
-            --fc-blue: #0065B3;
+            --fc-green: {{ isset($platformSettings) && $platformSettings ? $platformSettings->form_primary_color : '#008037' }};
+            --fc-blue: {{ isset($platformSettings) && $platformSettings ? $platformSettings->form_secondary_color : '#0065B3' }};
             --bs-primary: var(--fc-green);
         }
 
         body {
             font-family: "Poppins", Helvetica, Arial, sans-serif;
-            background: #f7f9fa;
+            background: {{ isset($platformSettings) && $platformSettings ? $platformSettings->form_background_color : '#f7f9fa' }};
             padding: 1rem 0;
         }
 
@@ -127,6 +127,15 @@
 
 <body>
     <div class="container-fluid px-2">
+        {{-- Logo --}}
+        <div class="text-center mb-3">
+            @if(isset($platformSettings) && $platformSettings && $platformSettings->logo_path)
+                <img src="{{ asset('storage/' . $platformSettings->logo_path) }}" alt="{{ config('app.name') }}" style="max-width: 200px; max-height: 60px; object-fit: contain;">
+            @else
+                <img src="https://creatibox.com.do/wp-content/uploads/2021/08/Logo-Creatibox-14-a%C3%B1os-2.png" alt="{{ config('app.name') }}" style="max-width: 200px;">
+            @endif
+        </div>
+
         <h2 class="fw-bold mb-3 text-center text-uppercase" style="color:var(--fc-blue)">
             Hola, {{ $capture->name }} 👋
         </h2>
@@ -171,27 +180,39 @@
             <p class="text-center small text-muted mb-0">
                 Formatos admitidos: JPG, PNG, HEIC … (máx. 3 MB)
             </p><br>
-                <p class="mb-2">
-                    <span class="text-warning" aria-hidden="true">⚠️</span>
-                    <strong>Importante:</strong> Asegúrate de que se vea claramente:
-                </p>
-                <ul class="list-unstyled small ps-3 mb-3 mb-md-4">
-                    <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>El nombre del establecimiento.</li>
-                    <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>La fecha (dentro del período de vigencia).</li>
-                    <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>El monto total (mínimo RD$500).</li>
-                    <li class="mb-0"><span class="text-secondary me-2" aria-hidden="true">○</span>Los productos Induveca o marcas participantes (Caserío, Frank’s, Don Pedro, Santal, Yoka, Kraft, etc.).</li>
-                </ul>
+
+                @if(isset($platformSettings) && $platformSettings && $platformSettings->form_instructions)
+                    <div class="small">{!! $platformSettings->form_instructions !!}</div>
+                @else
+                    <p class="mb-2">
+                        <span class="text-warning" aria-hidden="true">⚠️</span>
+                        <strong>Importante:</strong> Asegúrate de que se vea claramente:
+                    </p>
+                    <ul class="list-unstyled small ps-3 mb-3 mb-md-4">
+                        <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>El nombre del establecimiento.</li>
+                        <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>La fecha (dentro del período de vigencia).</li>
+                        <li class="mb-2"><span class="text-secondary me-2" aria-hidden="true">○</span>El monto total (mínimo RD$500).</li>
+                        <li class="mb-0"><span class="text-secondary me-2" aria-hidden="true">○</span>Los productos Induveca o marcas participantes.</li>
+                    </ul>
+                @endif
 
                 @php
-                    $examplePath = public_path('storage/images/example.png');
+                    $hasAdminExample = isset($platformSettings) && $platformSettings && $platformSettings->form_example_image;
+                    $legacyPath = public_path('storage/images/example.png');
                 @endphp
-                @if (file_exists($examplePath))
+
+                @if($hasAdminExample)
+                    <div class="guide-example-wrap text-center">
+                        <p class="small text-muted mb-2 mb-md-0 text-md-start">Guía visual — ejemplo</p>
+                        <img src="{{ asset('storage/' . $platformSettings->form_example_image) }}"
+                            alt="Ejemplo de cómo tomar la foto"
+                            loading="lazy">
+                    </div>
+                @elseif(file_exists($legacyPath))
                     <div class="guide-example-wrap text-center">
                         <p class="small text-muted mb-2 mb-md-0 text-md-start">Guía visual — ejemplo</p>
                         <img src="{{ asset('storage/images/example.png') }}"
                             alt="Ejemplo de cómo tomar la foto de una factura válida"
-                            width="640"
-                            height="360"
                             loading="lazy">
                     </div>
                 @endif

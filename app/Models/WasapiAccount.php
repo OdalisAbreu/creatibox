@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class WasapiAccount extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'phone',
+        'token',
+        'wasapi_id',
+        'final_message',
+    ];
 }

@@ -308,13 +308,6 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="city" class="form-label">Ciudad</label>
-                            <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city') }}" required>
-                            @error('city')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
                             <label for="storage" class="form-label">Tienda</label>
                             <input type="text" class="form-control @error('storage') is-invalid @enderror" id="storage" name="storage" value="{{ old('storage') }}" required>
                             @error('storage')
@@ -374,10 +367,6 @@
                         <div class="mb-3">
                             <label for="edit_contact_number" class="form-label">Número de Contacto</label>
                             <input type="text" class="form-control" id="edit_contact_number" name="contact_number">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_city" class="form-label">Ciudad</label>
-                            <input type="text" class="form-control" id="edit_city" name="city" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit_storage" class="form-label">Tienda</label>
@@ -500,10 +489,6 @@
                                 <div class="mb-3">
                                     <label for="edit_contact_number" class="form-label">Número de Contacto</label>
                                     <input type="text" class="form-control" id="edit_contact_number" name="contact_number" value="${data.contact_number || ''}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit_city" class="form-label">Ciudad</label>
-                                    <input type="text" class="form-control" id="edit_city" name="city" value="${data.city}" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit_storage" class="form-label">Tienda</label>

@@ -18,7 +18,11 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    @if(isset($platformSettings) && $platformSettings && $platformSettings->logo_path)
+                        <img src="{{ asset('storage/' . $platformSettings->logo_path) }}" alt="{{ config('app.name') }}" style="max-width: 200px; max-height: 60px; object-fit: contain;">
+                    @else
+                        <img src="https://creatibox.com.do/wp-content/uploads/2021/08/Logo-Creatibox-14-a%C3%B1os-2.png" alt="{{ config('app.name') }}" style="max-width: 200px;">
+                    @endif
                 </a>
             </div>
 

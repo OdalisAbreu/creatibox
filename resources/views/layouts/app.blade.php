@@ -20,6 +20,24 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @if(isset($platformSettings) && $platformSettings)
+    <style>
+        :root {
+            --admin-primary: {{ $platformSettings->admin_primary_color ?? '#0d6efd' }};
+            --admin-secondary: {{ $platformSettings->admin_secondary_color ?? '#6c757d' }};
+        }
+        .btn-primary { background-color: var(--admin-primary) !important; border-color: var(--admin-primary) !important; }
+        .btn-primary:hover { filter: brightness(0.85); }
+        .bg-primary { background-color: var(--admin-primary) !important; }
+        .text-primary { color: var(--admin-primary) !important; }
+        .btn-outline-primary { color: var(--admin-primary) !important; border-color: var(--admin-primary) !important; }
+        .btn-outline-primary:hover { background-color: var(--admin-primary) !important; color: #fff !important; }
+        .border-indigo-400 { border-color: var(--admin-primary) !important; }
+    </style>
+    @endif
+
+    @stack('styles')
 </head>
 
 <body class="font-sans antialiased">

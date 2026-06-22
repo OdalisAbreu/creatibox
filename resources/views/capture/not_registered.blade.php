@@ -9,14 +9,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         :root {
-            --fc-green: #008037;
-            --fc-blue: #0065B3;
+            --fc-green: {{ isset($platformSettings) && $platformSettings ? $platformSettings->form_primary_color : '#008037' }};
+            --fc-blue: {{ isset($platformSettings) && $platformSettings ? $platformSettings->form_secondary_color : '#0065B3' }};
             --whatsapp-green: #25D366;
         }
 
         body {
             font-family: "Poppins", Helvetica, Arial, sans-serif;
-            background: #f7f9fa;
+            background: {{ isset($platformSettings) && $platformSettings ? $platformSettings->form_background_color : '#f7f9fa' }};
             padding: 1rem 0;
         }
 

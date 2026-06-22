@@ -77,7 +77,6 @@
                 <th>Nombre</th>
                 <th>Cédula</th>
                 <th>Número de Contacto</th>
-                <th>Ciudad</th>
                 <th>Establecimiento </th>
                 <th>Fecha Registro</th>
                 <th>Imagen</th>
@@ -90,7 +89,6 @@
                 <td>{{ $capture->name }}</td>
                 <td>{{ $capture->card_id }}</td>
                 <td>{{ $capture->contact_number ?? $capture->cell_phone }}</td>
-                <td>{{ $capture->city }}</td>
                 <td>{{ $capture->storage }}</td>
                 <td> {{ $capture->created_at->format('d/m/Y') }}</td>
                 <td>

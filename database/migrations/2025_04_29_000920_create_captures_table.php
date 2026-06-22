@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('card_id');
             $table->string('contact_number')->nullable();
-            $table->string('city');
             $table->string('storage');
             $table->boolean('completed')->default(false);
             $table->timestamps();

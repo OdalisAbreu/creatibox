@@ -32,7 +32,6 @@ class CaptureController extends Controller
             'name' => $request->name,
        //     'invoice_number' => $request->invoice_number,
             'contact_number' => $request->contact_number ?? $cell_phone,
-            'city' => $request->city ?? '',
             'storage' => $request->storage ?? '',
             'card_id' => $card_id,
             'completed' => false,

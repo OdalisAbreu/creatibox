@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandingController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WasapiAccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CaptureController;
 use App\Http\Controllers\ProfileController;
@@ -26,6 +29,20 @@ Route::middleware('auth')->group(function () {
         Log::info('Prueba de logging funcionando');
         return response()->json(['message' => 'Log funcionando']);
     });
+});
+
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('/wasapi', [WasapiAccountController::class, 'edit'])->name('wasapi.edit');
+    Route::put('/wasapi', [WasapiAccountController::class, 'update'])->name('wasapi.update');
+
+    Route::get('/branding', [BrandingController::class, 'edit'])->name('branding.edit');
+    Route::put('/branding', [BrandingController::class, 'update'])->name('branding.update');
 });
 
 require __DIR__ . '/auth.php';
