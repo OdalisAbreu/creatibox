@@ -67,7 +67,7 @@ class CaptureController extends Controller
         try {
             // Validar que se envíe una imagen
             $request->validate([
-                'invoice_image' => 'required|image|max:5072' // 3MB máximo
+                'invoice_image' => 'required|image|max:15360' // 15MB máximo
             ]);
 
             $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail();
@@ -91,12 +91,21 @@ class CaptureController extends Controller
 //return $wasapiAccount->final_message;
             $wasapiService = new WasapiService();
             $wasapiService->sendText($capture->number_send_message ?? $capture->cell_phone, $mensaje);
-            return view('capture.completed', compact('capture', 'wasapiAccount'));
-            
+            return redirect()->route('capture.completed', ['cell_phone' => $cell_phone]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
           Log::error('Error al procesar la imagen: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al procesar la imagen. Por favor, intenta nuevamente.');
-        } 
+            return redirect()->route('capture.form', ['cell_phone' => $cell_phone])
+                ->with('error', 'Error al procesar la imagen. Por favor, intenta nuevamente.');
+        }
+    }
+
+    public function completed($cell_phone)
+    {
+        $capture = Capture::where('cell_phone', $cell_phone)->latest()->firstOrFail();
+        $wasapiAccount = WasapiAccount::first();
+
+        return view('capture.completed', compact('capture', 'wasapiAccount'));
     }
 
 

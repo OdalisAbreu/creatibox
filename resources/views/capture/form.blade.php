@@ -178,7 +178,7 @@
             </div>
 
             <p class="text-center small text-muted mb-0">
-                Formatos admitidos: JPG, PNG, HEIC … (máx. 3 MB)
+                Formatos admitidos: JPG, PNG, HEIC … (máx. 15 MB)
             </p><br>
 
                 @if(isset($platformSettings) && $platformSettings && $platformSettings->form_instructions)

@@ -56,4 +56,7 @@ Route::get('/admin/export/preview', [AdminController::class, 'previewPdf'])
 Route::post('/capture/image/{cell_phone}', [CaptureController::class, 'submitImage'])
     ->name('capture.submitImage');
 
+Route::get('/capture/completado/{cell_phone}', [CaptureController::class, 'completed'])
+    ->name('capture.completed');
+
 Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
