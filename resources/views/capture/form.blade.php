@@ -165,21 +165,6 @@
 
             <div class="guide-instructivo mb-4">
 
-            <div class="d-flex justify-content-center mb-3">
-                <label for="invoice_image" class="camera-label" title="Tomar foto / elegir imagen">
-                    <i class="bi bi-camera-fill"></i>
-                </label>
-                <input type="file"
-                    id="invoice_image"
-                    name="invoice_image"
-                    accept="image/*"
-                    capture="environment"
-                    required>
-            </div>
-
-            <p class="text-center small text-muted mb-0">
-                Formatos admitidos: JPG, PNG, HEIC … (máx. 15 MB)
-            </p><br>
 
                 @if(isset($platformSettings) && $platformSettings && $platformSettings->form_instructions)
                     <div class="small">{!! $platformSettings->form_instructions !!}</div>
@@ -217,6 +202,21 @@
                     </div>
                 @endif
             </div>
+            <div class="d-flex justify-content-center mb-3">
+                <label for="invoice_image" class="camera-label" title="Tomar foto / elegir imagen">
+                    <i class="bi bi-camera-fill"></i>
+                </label>
+                <input type="file"
+                    id="invoice_image"
+                    name="invoice_image"
+                    accept="image/*"
+                    capture="environment"
+                    required>
+            </div>
+
+            <p class="text-center small text-muted mb-0">
+                Formatos admitidos: JPG, PNG, HEIC … (máx. 15 MB)
+            </p><br>
 
         </form>
     </div>
